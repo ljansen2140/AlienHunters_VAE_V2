@@ -33,6 +33,54 @@ pic_data = datab.load_data_sets(CIFAR10_Filenames)
 
 
 
+# Custom loss layer
+class CustomVariationalLayer(Layer):
+    def __init__(self, **kwargs):
+        self.is_placeholder = True
+        super(CustomVariationalLayer, self).__init__(**kwargs)
+
+    def vae_loss(self, x, x_decoded_mean_squash):
+        x = K.flatten(x)
+        x_decoded_mean_squash = K.flatten(x_decoded_mean_squash)
+        xent_loss = img_rows * img_cols * metrics.binary_crossentropy(x, x_decoded_mean_squash)
+        kl_loss = - 0.5 * K.mean(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
+        return K.mean(xent_loss + kl_loss)
+
+    def call(self, inputs):
+        x = inputs[0]
+        x_decoded_mean_squash = inputs[1]
+        loss = self.vae_loss(x, x_decoded_mean_squash)
+        self.add_loss(loss, inputs=inputs)
+        # We don't use this output.
+        return x
+
+
+y = CustomVariationalLayer()([x, x_decoded_mean_squash])
+vae = Model(x, y)
+
+sgd = optimizers.SGD(lr=0.01)
+vae.compile(optimizer=sgd, loss=None)
+vae.summary()
+
+
+
+
+def sampling(args):
+    z_mean, z_log_var = args
+    epsilon = K.random_normal(shape=(K.shape(z_mean)[0], latent_dim),
+                              mean=0., stddev=epsilon_std)
+    return z_mean + K.exp(z_log_var) * epsilon
+
+# note that "output_shape" isn't necessary with the TensorFlow backend
+# so you could write `Lambda(sampling)([z_mean, z_log_var])`
+z = Lambda(sampling, output_shape=(latent_dim,))([z_mean, z_log_var])
+
+
+
+
+
+
+
 def make_encoder(input_shape):
     encoder_input = keras.Input(shape=input_shape)
     x = layers.Conv2D(3, kernel_size=(2,2), padding='same', activation='relu')(encoder_input)
@@ -98,6 +146,9 @@ vae = make_vae(en, de, keras.Input(shape=s))
 vae.summary()
 
 vae.compile(optimizer='adam', loss='binary_crossentropy')
+
+
+
 
 
 
