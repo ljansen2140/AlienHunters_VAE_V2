@@ -6,7 +6,7 @@ from keras import backend as K
 
 import matplotlib.pyplot as plt
 
-import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import ImageGrid
 
 
 
@@ -114,16 +114,6 @@ max_epochs = 10
 num_rows_plot = 5
 
 training_data = pic_data
-#training_data = x_train
-
-
-# en = make_encoder(s)
-# en.summary()
-# de = make_decoder(s)
-# de.summary()
-
-
-# vae = make_vae(en, de, keras.Input(shape=s))
 
 
 
@@ -136,7 +126,7 @@ training_data = pic_data
 
 
 # Create Plotter Function
-def plot_step(vae, sample_d, ax, n, plot_i):
+def plot_step(vae, sample_d, grid, n, plot_i):
     #Function here
     # Plot and display result
 
@@ -144,13 +134,14 @@ def plot_step(vae, sample_d, ax, n, plot_i):
     # Run encoder and grab variable [2] (Latent data representation)
     # Run decoder on latent space
     result = vae.predict(sample_data)
+    offset = n*plot_i
+    grid[offset].set_ylabel('EPOCH {}'.format(plot_i*(max_epochs//num_rows_plot)))
     for i in range(n):
-        ax[plot_i, i].imshow(result[i], cmap=plt.cm.binary)
-        ax[plot_i,i].axis("off")
+        grid[offset+1].set_aspect('equal')
+        grid[offset+i].imshow(result[i], cmap=plt.cm.binary)
+        grid[offset+i].set_xticklabels([])
+        grid[offset+i].set_yticklabels([])
         
-
-    #plt.imshow(result[0], cmap=plt.cm.binary)
-    #plt.show()
 
 
 
@@ -162,34 +153,30 @@ def plot_step(vae, sample_d, ax, n, plot_i):
 epoch_plot_step = [i for i in range(0,max_epochs,max_epochs // num_rows_plot)]
 
 
-rows = 4 # defining no. of rows in figure
-cols = 12 # defining no. of colums in figure
-f = plt.figure(figsize=(2*cols,2*rows)) 
-f.tight_layout()
-
-
-
-
 # Setup Plot
 # Should have the same number of rows as the sample data length
-f, axxar = plt.subplots(num_rows_plot+1, number_of_pics)
+fig = plt.figure(figsize=(number_of_pics, num_rows_plot+1))
+fig.set_size_inches(40,40)
+grid = ImageGrid(fig, 111, nrows_ncols=(num_rows_plot+1, number_of_pics), axes_pad=0.1)
 
+grid[0].set_ylabel('BASE TRUTH')
 for i in range(number_of_pics):
-    axxar[0,i].imshow(sample_data[i], cmap=plt.cm.binary)
-    axxar[0,i].axis("off")
-#plt.show()
+    grid[i].set_aspect('equal')
+    grid[i].imshow(sample_data[i], cmap=plt.cm.binary)
+    grid[i].set_xticklabels([])
+    grid[i].set_yticklabels([])
 
-#exit()
 
 plot_iter = 1
 for epoch in range(max_epochs):
     history = vae.fit(training_data, training_data, epochs=1)
-    #f.add_subplot(rows,cols, epoch+1)
 
     if epoch in epoch_plot_step:
-        plot_step(vae, sample_data, axxar, number_of_pics, plot_iter)
+        plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
         plot_iter += 1
 
+
+plt.savefig("results.png")
 plt.show()
 
 
