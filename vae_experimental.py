@@ -104,7 +104,7 @@ vae.compile(optimizer='adam')
 
 #CONFIG
 # s = (32,32,3)
-#s = (28,28,1)
+# s = (28,28,1)
 #Select static Sample data ranging [x:y-1]
 number_of_pics = 10
 sample_data = pic_data[0:number_of_pics]
@@ -113,7 +113,10 @@ sample_data = pic_data[0:number_of_pics]
 max_epochs = 10
 num_rows_plot = 5
 
-training_data = pic_data
+
+#Setup training and validation data
+training_data = pic_data[:4000]
+validation_data = pic_data[4000:]
 
 
 
@@ -169,7 +172,7 @@ for i in range(number_of_pics):
 
 plot_iter = 1
 for epoch in range(max_epochs):
-    history = vae.fit(training_data, training_data, epochs=1)
+    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
 
     if epoch in epoch_plot_step:
         plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
