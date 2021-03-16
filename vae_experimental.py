@@ -102,22 +102,21 @@ vae.add_loss(total_loss)
 vae.compile(optimizer='adam')
 ##########################################################
 
-#CONFIG
-# s = (32,32,3)
-# s = (28,28,1)
-#Select static Sample data ranging [x:y-1]
-number_of_pics = 10
-sample_data = pic_data[0:number_of_pics]
-#sample_data = x_train[0:number_of_pics]
-# Number of epochs to run for
-max_epochs = 10
-num_rows_plot = 5
-
 
 #Setup training and validation data
 training_data = pic_data[:4000]
 validation_data = pic_data[4000:]
 
+
+#CONFIG
+#Select static Sample data ranging [x:y-1]
+number_of_pics = 10
+sample_data = training_data[0:number_of_pics]
+sample_data_v = validation_data[0:number_of_pics]
+
+# Number of epochs to run for
+max_epochs = 10
+num_rows_plot = 5
 
 
 #################################################################
@@ -129,21 +128,21 @@ validation_data = pic_data[4000:]
 
 
 # Create Plotter Function
-def plot_step(vae, sample_d, grid, n, plot_i):
+def plot_step(vae, target_ims, g, n, plot_i):
     #Function here
     # Plot and display result
 
     # Simulate Predictions
     # Run encoder and grab variable [2] (Latent data representation)
     # Run decoder on latent space
-    result = vae.predict(sample_data)
+    result = vae.predict(target_ims)
     offset = n*plot_i
-    grid[offset].set_ylabel('EPOCH {}'.format(plot_i*(max_epochs//num_rows_plot)))
+    g[offset].set_ylabel('EPOCH {}'.format(plot_i*(max_epochs//num_rows_plot)))
     for i in range(n):
-        grid[offset+1].set_aspect('equal')
-        grid[offset+i].imshow(result[i], cmap=plt.cm.binary)
-        grid[offset+i].set_xticklabels([])
-        grid[offset+i].set_yticklabels([])
+        g[offset+1].set_aspect('equal')
+        g[offset+i].imshow(result[i], cmap=plt.cm.binary)
+        g[offset+i].set_xticklabels([])
+        g[offset+i].set_yticklabels([])
         
 
 
@@ -156,7 +155,7 @@ def plot_step(vae, sample_d, grid, n, plot_i):
 epoch_plot_step = [i for i in range(0,max_epochs,max_epochs // num_rows_plot)]
 
 
-# Setup Plot
+# Setup Plot for Training Images
 # Should have the same number of rows as the sample data length
 fig = plt.figure(figsize=(number_of_pics, num_rows_plot+1))
 fig.set_size_inches(40,40)
@@ -170,17 +169,35 @@ for i in range(number_of_pics):
     grid[i].set_yticklabels([])
 
 
+# Setup Plot for Validation Images
+# Should have the same number of rows as the sample data length
+fig_v = plt.figure(figsize=(number_of_pics, num_rows_plot+1))
+fig_v.set_size_inches(40,40)
+grid_v = ImageGrid(fig_v, 111, nrows_ncols=(num_rows_plot+1, number_of_pics), axes_pad=0.1)
+
+grid_v[0].set_ylabel('BASE TRUTH')
+for i in range(number_of_pics):
+    grid_v[i].set_aspect('equal')
+    grid_v[i].imshow(validation_data[i], cmap=plt.cm.binary)
+    grid_v[i].set_xticklabels([])
+    grid_v[i].set_yticklabels([])
+
+
 plot_iter = 1
 for epoch in range(max_epochs):
     history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
 
     if epoch in epoch_plot_step:
         plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
+        plot_step(vae, validation_data, grid_v, number_of_pics, plot_iter)
         plot_iter += 1
 
 
-plt.savefig("results.png")
-plt.show()
+fig.savefig("training-results.png")
+fig.show()
+
+fig_v.savefig("validation-results.png")
+fig_v.show()
 
 
 
