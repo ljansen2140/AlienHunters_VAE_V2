@@ -36,7 +36,7 @@ pic_data = datab.load_data_sets(CIFAR10_Filenames)
 
 #CONSTANTS
 
-LATENT_DIM = 32
+LATENT_DIM = 128
 
 input_shape = (32,32,3)
 
@@ -50,11 +50,11 @@ def sampling(args):
 encoder_input = keras.Input(shape=input_shape)
 x = layers.Conv2D(3, kernel_size=(2,2), padding='same', activation='relu')(encoder_input)
 x = layers.Conv2D(32, kernel_size=(2,2), padding='same', activation='relu', strides=(2,2))(x)
-x = layers.Conv2D(32, kernel_size=3, padding='same', activation='relu', strides=1)(x)
-x = layers.Conv2D(32, kernel_size=3, padding='same', activation='relu', strides=1)(x)
+x = layers.Conv2D(64, kernel_size=3, padding='same', activation='relu', strides=1)(x)
+x = layers.Conv2D(64, kernel_size=3, padding='same', activation='relu', strides=1)(x)
 
 flat_layer = layers.Flatten()(x)
-hidden_layer = layers.Dense(128)(flat_layer)
+hidden_layer = layers.Dense(512)(flat_layer)
 z_mean = layers.Dense(LATENT_DIM)(hidden_layer)
 z_log_var = layers.Dense(LATENT_DIM)(hidden_layer)
 
@@ -65,14 +65,14 @@ encoder.summary()
 ##########################################################
 
 #Make the decoder Here
-decoder_input = keras.Input(shape=(32,))
-x = layers.Dense(32)(decoder_input)
-x = layers.Dense(32 * (input_shape[0] / 2) * (input_shape[1] / 2))(x)
+decoder_input = keras.Input(shape=(LATENT_DIM,))
+x = layers.Dense(512)(decoder_input)
+x = layers.Dense(64 * (input_shape[0] / 2) * (input_shape[1] / 2))(x)
 
-x = layers.Reshape((int(input_shape[0] / 2), int(input_shape[1] / 2), 32))(x)
+x = layers.Reshape((int(input_shape[0] / 2), int(input_shape[1] / 2), 64))(x)
 
-x = layers.Conv2DTranspose(32, kernel_size=3, padding='same', strides=1, activation='relu')(x)
-x = layers.Conv2DTranspose(32, kernel_size=3, padding='same', strides=1, activation='relu')(x)
+x = layers.Conv2DTranspose(64, kernel_size=3, padding='same', strides=1, activation='relu')(x)
+x = layers.Conv2DTranspose(64, kernel_size=3, padding='same', strides=1, activation='relu')(x)
 x = layers.Conv2DTranspose(32, kernel_size=(2,2), padding='valid', strides=(2,2), activation='relu')(x)
 decoder_output = layers.Conv2D(3, kernel_size=(2,2), padding='same', activation='sigmoid')(x)
 
@@ -87,7 +87,7 @@ z = encoder(encoder_input)
 output = decoder(z)
 vae = keras.Model(encoder_input, output, name="vae")
 vae.summary()
-
+#exit()
 
 # Custom Loss Function
 # def VAE_loss_function(y_true, y_pred):
@@ -136,7 +136,7 @@ def plot_step(vae, target_ims, g, n, plot_i):
     # Run encoder and grab variable [2] (Latent data representation)
     # Run decoder on latent space
     result = vae.predict(target_ims)
-    offset = n*plot_i
+    offset = n*(plot_i+1)
     g[offset].set_ylabel('EPOCH {}'.format(plot_i*(max_epochs//num_rows_plot)))
     for i in range(n):
         g[offset+1].set_aspect('equal')
@@ -183,7 +183,7 @@ for i in range(number_of_pics):
     grid_v[i].set_yticklabels([])
 
 
-plot_iter = 1
+plot_iter = 0
 for epoch in range(max_epochs):
     history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
 
