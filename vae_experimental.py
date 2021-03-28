@@ -37,6 +37,7 @@ pic_data = datab.load_data_sets(CIFAR10_Filenames)
 #CONSTANTS
 
 LATENT_DIM = 128
+HIDDEN_LAYER_DIM = 512
 
 input_shape = (32,32,3)
 
@@ -54,7 +55,7 @@ x = layers.Conv2D(64, kernel_size=3, padding='same', activation='relu', strides=
 x = layers.Conv2D(64, kernel_size=3, padding='same', activation='relu', strides=1)(x)
 
 flat_layer = layers.Flatten()(x)
-hidden_layer = layers.Dense(512)(flat_layer)
+hidden_layer = layers.Dense(HIDDEN_LAYER_DIM)(flat_layer)
 z_mean = layers.Dense(LATENT_DIM)(hidden_layer)
 z_log_var = layers.Dense(LATENT_DIM)(hidden_layer)
 
@@ -66,7 +67,7 @@ encoder.summary()
 
 #Make the decoder Here
 decoder_input = keras.Input(shape=(LATENT_DIM,))
-x = layers.Dense(512)(decoder_input)
+x = layers.Dense(HIDDEN_LAYER_DIM)(decoder_input)
 x = layers.Dense(64 * (input_shape[0] / 2) * (input_shape[1] / 2))(x)
 
 x = layers.Reshape((int(input_shape[0] / 2), int(input_shape[1] / 2), 64))(x)
