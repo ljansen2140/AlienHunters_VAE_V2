@@ -13,6 +13,9 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 #Data Builder File: ./data_builder.py
 import data_builder as datab
 
+#Data Pipeline for FMOW dataset: ./pipeline.py
+from pipeline import load_im
+
 
 #MNIST
 from keras.datasets import mnist
@@ -30,16 +33,23 @@ CIFAR10_Filenames = ['data_batch_1','data_batch_2','data_batch_3','data_batch_4'
 # TODO: Double check the data returned is what is expected
 # load_data_sets(file_list, data_id)
 # Default data ID is 3 for Cats - See data_builder.py for details
-pic_data = datab.load_data_sets(CIFAR10_Filenames)
+#pic_data = datab.load_data_sets(CIFAR10_Filenames)
 
+# ^^^ Used for CIFAR10
 
+################################################################
 
 #CONSTANTS
 
 LATENT_DIM = 128
 HIDDEN_LAYER_DIM = 512
 
-input_shape = (32,32,3)
+IMAGE_DIMENSIONS = (1024,1024)
+
+input_shape = IMAGE_DIMENSIONS + (3,)
+
+
+################################################################
 
 # Sampling Function
 def sampling(args):
@@ -97,7 +107,7 @@ predicted_truth = K.flatten(output)
 bc_loss = 32 * 32 * keras.losses.binary_crossentropy(base_truth, predicted_truth)
 kl_loss = (-0.5) * K.mean(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
 total_loss = K.mean(bc_loss + kl_loss)
-##########################################################
+
 
 vae.add_loss(total_loss)
 vae.compile(optimizer='adam')
@@ -105,15 +115,51 @@ vae.compile(optimizer='adam')
 
 
 #Setup training and validation data
-training_data = pic_data[:4000]
-validation_data = pic_data[4000:]
+#CIFAR10 DATA
+#training_data = pic_data[:4000]
+#validation_data = pic_data[4000:]
 
 
-#CONFIG
+train_count = 32
+val_count = 8
+
+
+#Load Manifest
+mf_file = open("airport.files", "r")
+data = mf_file.read()
+objects = data.split(" ")
+
+
+#Split Manifest into Train and Val
+val_target = "val/airport/"
+train_target = "train/airport/"
+
+train_manifest = []
+val_manifest = []
+
+#Add all targets to respective manifests
+for item in objects:
+    if val_target in item:
+        val_manifest.append(item)
+    if train_target in item:
+        train_manifest.append(item)
+
+#train_manifest: Contains all items that can be drawn as training data
+#val_manifest: Contains all items that can be drawn as validation data
+#train_count: Number of training items to load
+#val_count: Number of validation items to load
+
+
+################################################################
+
+
+#CONFIG-VARIABLES
 #Select static Sample data ranging [x:y-1]
 number_of_pics = 10
-sample_data = training_data[0:number_of_pics]
-sample_data_v = validation_data[0:number_of_pics]
+#sample_data = training_data[0:number_of_pics]
+#sample_data_v = validation_data[0:number_of_pics]
+sample_data = load_im(train_manifest, number_of_pics, IMAGE_DIMENSIONS)
+sample_data_v = load_im(val_manifest, number_of_pics, IMAGE_DIMENSIONS)
 
 # Number of epochs to run for
 max_epochs = 10
@@ -126,7 +172,8 @@ num_rows_plot = 5
 
 
 
-
+################################################################
+#PLOTTING CONFIGURATION
 
 # Create Plotter Function
 def plot_step(vae, target_ims, g, n, plot_i):
@@ -145,11 +192,6 @@ def plot_step(vae, target_ims, g, n, plot_i):
         g[offset+i].set_xticklabels([])
         g[offset+i].set_yticklabels([])
         
-
-
-
-
-
 
 
 # Number of Rows to plot
@@ -184,8 +226,21 @@ for i in range(number_of_pics):
     grid_v[i].set_yticklabels([])
 
 
+################################################################
+
+
+#TRAINING HAPPENS HERE
+
 plot_iter = 0
 for epoch in range(max_epochs):
+
+    #!!!
+    #FIXME: Need to load data here from load_im()
+    #TODO: Add asynchronous behavior?
+    #NOTE: Current load times of 48 images is ~19.5 seconds 
+    continue
+    #TODO: Remove continue
+
     history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
 
     if epoch in epoch_plot_step:
@@ -193,6 +248,10 @@ for epoch in range(max_epochs):
         plot_step(vae, validation_data, grid_v, number_of_pics, plot_iter)
         plot_iter += 1
 
+
+
+################################################################
+#SAVE IMAGE RESULTS
 
 fig.savefig("training-results.png")
 fig.show()
