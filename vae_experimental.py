@@ -41,8 +41,8 @@ CIFAR10_Filenames = ['data_batch_1','data_batch_2','data_batch_3','data_batch_4'
 
 #CONSTANTS
 
-LATENT_DIM = 128
-HIDDEN_LAYER_DIM = 512
+LATENT_DIM = 1024
+HIDDEN_LAYER_DIM = 4096
 
 IMAGE_DIMENSIONS = (512,512)
 
