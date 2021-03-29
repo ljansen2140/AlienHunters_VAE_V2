@@ -68,7 +68,7 @@ x = layers.MaxPooling2D((2,2), padding='same', name='Pooling Layer 1')(x)
 x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv Layer 2')(x)
 x = layers.MaxPooling2D((2,2), padding='same', name='Pooling Layer 2')(x)
 
-x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, 'Conv Layer 3')(x)
+x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv Layer 3')(x)
 
 flat_layer = layers.Flatten(name='Flatten Layer')(x)
 hidden_layer = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden Layer')(flat_layer)
