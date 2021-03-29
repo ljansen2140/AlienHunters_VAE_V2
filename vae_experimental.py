@@ -252,7 +252,7 @@ for epoch in range(max_epochs):
 
     if epoch in epoch_plot_step:
         plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
-        plot_step(vae, validation_data, grid_v, number_of_pics, plot_iter)
+        plot_step(vae, sample_data_v, grid_v, number_of_pics, plot_iter)
         plot_iter += 1
 
 
