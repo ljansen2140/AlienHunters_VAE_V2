@@ -59,33 +59,48 @@ def sampling(args):
 
 #Make the encoder here
 encoder_input = keras.Input(shape=input_shape)
-x = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='relu')(encoder_input)
-x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4))(x)
-x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1)(x)
-x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1)(x)
+x = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='relu', name='RGB Layer')(encoder_input)
 
-flat_layer = layers.Flatten()(x)
-hidden_layer = layers.Dense(HIDDEN_LAYER_DIM)(flat_layer)
-z_mean = layers.Dense(LATENT_DIM)(hidden_layer)
-z_log_var = layers.Dense(LATENT_DIM)(hidden_layer)
 
-encoder_output = layers.Lambda(sampling, output_shape=(LATENT_DIM,))([z_mean, z_log_var])
+x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv Layer 1')(x)
+x = layers.MaxPooling2D((2,2), padding='same', name='Pooling Layer 1')(x)
+
+x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv Layer 2')(x)
+x = layers.MaxPooling2D((2,2), padding='same', name='Pooling Layer 2')(x)
+
+x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, 'Conv Layer 3')(x)
+
+flat_layer = layers.Flatten(name='Flatten Layer')(x)
+hidden_layer = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden Layer')(flat_layer)
+
+z_mean = layers.Dense(LATENT_DIM, name='Z_MEAN')(hidden_layer)
+z_log_var = layers.Dense(LATENT_DIM, name='Z_LOG_VAR')(hidden_layer)
+
+encoder_output = layers.Lambda(sampling, output_shape=(LATENT_DIM,), name='Latent Space')([z_mean, z_log_var])
 
 encoder = keras.Model(encoder_input, encoder_output, name="encoder")
 encoder.summary()
+
+
 ##########################################################
 
 #Make the decoder Here
 decoder_input = keras.Input(shape=(LATENT_DIM,))
-x = layers.Dense(HIDDEN_LAYER_DIM)(decoder_input)
-x = layers.Dense(32 * (input_shape[0] / 4) * (input_shape[1] / 4))(x)
+x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden Layer')(decoder_input)
+x = layers.Dense(32 * (input_shape[0] / 4) * (input_shape[1] / 4), name='Upscale Layer')(x)
 
 x = layers.Reshape((int(input_shape[0] / 4), int(input_shape[1] / 4), 32))(x)
 
-x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu')(x)
-x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu')(x)
-x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu')(x)
-decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid')(x)
+x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose Layer 3')(x)
+
+x = layers.UpSampling2D((2,2), name="Up Sample Layer 2")(x)
+x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose Layer 2')(x)
+
+x = layers.UpSampling2D((2,2), name="Up Sample Layer 1")(x)
+x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', , name='Transpose Layer 1')(x)
+
+
+decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid', name='Transpose RGB Layer')(x)
 
 decoder = keras.Model(decoder_input, decoder_output, name="decoder")
 decoder.summary()
@@ -98,7 +113,7 @@ z = encoder(encoder_input)
 output = decoder(z)
 vae = keras.Model(encoder_input, output, name="vae")
 vae.summary()
-#exit()
+exit()
 
 # Custom Loss Function
 # def VAE_loss_function(y_true, y_pred):
