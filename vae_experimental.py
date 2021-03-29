@@ -98,7 +98,7 @@ z = encoder(encoder_input)
 output = decoder(z)
 vae = keras.Model(encoder_input, output, name="vae")
 vae.summary()
-exit()
+#exit()
 
 # Custom Loss Function
 # def VAE_loss_function(y_true, y_pred):
