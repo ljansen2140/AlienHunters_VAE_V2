@@ -59,10 +59,10 @@ def sampling(args):
 
 #Make the encoder here
 encoder_input = keras.Input(shape=input_shape)
-x = layers.Conv2D(3, kernel_size=(5,5), padding='same', activation='relu')(encoder_input)
-x = layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', strides=(5,5))(x)
-x = layers.Conv2D(32, kernel_size=3, padding='same', activation='relu', strides=1)(x)
-x = layers.Conv2D(32, kernel_size=3, padding='same', activation='relu', strides=1)(x)
+x = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='relu')(encoder_input)
+x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4))(x)
+x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1)(x)
+x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1)(x)
 
 flat_layer = layers.Flatten()(x)
 hidden_layer = layers.Dense(HIDDEN_LAYER_DIM)(flat_layer)
@@ -82,10 +82,10 @@ x = layers.Dense(32 * (input_shape[0] / 2) * (input_shape[1] / 2))(x)
 
 x = layers.Reshape((int(input_shape[0] / 2), int(input_shape[1] / 2), 32))(x)
 
-x = layers.Conv2DTranspose(32, kernel_size=3, padding='same', strides=1, activation='relu')(x)
-x = layers.Conv2DTranspose(32, kernel_size=3, padding='same', strides=1, activation='relu')(x)
-x = layers.Conv2DTranspose(32, kernel_size=(5,5), padding='valid', strides=(5,5), activation='relu')(x)
-decoder_output = layers.Conv2D(3, kernel_size=(5,5), padding='same', activation='sigmoid')(x)
+x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu')(x)
+x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu')(x)
+x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu')(x)
+decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid')(x)
 
 decoder = keras.Model(decoder_input, decoder_output, name="decoder")
 decoder.summary()
@@ -98,7 +98,7 @@ z = encoder(encoder_input)
 output = decoder(z)
 vae = keras.Model(encoder_input, output, name="vae")
 vae.summary()
-#exit()
+exit()
 
 # Custom Loss Function
 # def VAE_loss_function(y_true, y_pred):
