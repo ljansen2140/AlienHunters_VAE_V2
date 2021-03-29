@@ -221,7 +221,7 @@ grid_v = ImageGrid(fig_v, 111, nrows_ncols=(num_rows_plot+1, number_of_pics), ax
 grid_v[0].set_ylabel('BASE TRUTH')
 for i in range(number_of_pics):
     grid_v[i].set_aspect('equal')
-    grid_v[i].imshow(validation_data[i], cmap=plt.cm.binary)
+    grid_v[i].imshow(sample_data_v[i], cmap=plt.cm.binary)
     grid_v[i].set_xticklabels([])
     grid_v[i].set_yticklabels([])
 
