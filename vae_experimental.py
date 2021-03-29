@@ -97,7 +97,7 @@ x = layers.UpSampling2D((2,2), name="Up Sample Layer 2")(x)
 x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose Layer 2')(x)
 
 x = layers.UpSampling2D((2,2), name="Up Sample Layer 1")(x)
-x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', , name='Transpose Layer 1')(x)
+x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', name='Transpose Layer 1')(x)
 
 
 decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid', name='Transpose RGB Layer')(x)
