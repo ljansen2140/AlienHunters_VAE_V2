@@ -78,9 +78,9 @@ encoder.summary()
 #Make the decoder Here
 decoder_input = keras.Input(shape=(LATENT_DIM,))
 x = layers.Dense(HIDDEN_LAYER_DIM)(decoder_input)
-x = layers.Dense(32 * (input_shape[0] / 2) * (input_shape[1] / 2))(x)
+x = layers.Dense(32 * (input_shape[0] / 4) * (input_shape[1] / 4))(x)
 
-x = layers.Reshape((int(input_shape[0] / 2), int(input_shape[1] / 2), 32))(x)
+x = layers.Reshape((int(input_shape[0] / 4), int(input_shape[1] / 4), 32))(x)
 
 x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu')(x)
 x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu')(x)
