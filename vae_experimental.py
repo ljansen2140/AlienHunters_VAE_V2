@@ -248,7 +248,7 @@ for epoch in range(max_epochs):
     validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
     print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
 
-    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
+    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data), batch_size=1)
 
     if epoch in epoch_plot_step:
         plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
