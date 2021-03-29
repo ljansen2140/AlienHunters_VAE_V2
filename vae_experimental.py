@@ -44,7 +44,7 @@ CIFAR10_Filenames = ['data_batch_1','data_batch_2','data_batch_3','data_batch_4'
 LATENT_DIM = 128
 HIDDEN_LAYER_DIM = 512
 
-IMAGE_DIMENSIONS = (1024,1024)
+IMAGE_DIMENSIONS = (512,512)
 
 input_shape = IMAGE_DIMENSIONS + (3,)
 
@@ -78,7 +78,7 @@ encoder.summary()
 #Make the decoder Here
 decoder_input = keras.Input(shape=(LATENT_DIM,))
 x = layers.Dense(HIDDEN_LAYER_DIM)(decoder_input)
-x = layers.Dense(64 * (input_shape[0] / 2) * (input_shape[1] / 2))(x)
+x = layers.Dense(32 * (input_shape[0] / 2) * (input_shape[1] / 2))(x)
 
 x = layers.Reshape((int(input_shape[0] / 2), int(input_shape[1] / 2), 64))(x)
 
