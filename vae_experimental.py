@@ -231,15 +231,22 @@ for i in range(number_of_pics):
 
 #TRAINING HAPPENS HERE
 
+#TODO: Remove this maybe?
+import time
+
 plot_iter = 0
 for epoch in range(max_epochs):
 
     #!!!
-    #FIXME: Need to load data here from load_im()
     #TODO: Add asynchronous behavior?
     #NOTE: Current load times of 48 images is ~19.5 seconds 
-    continue
-    #TODO: Remove continue
+
+    #TODO: Remove Timing functions?
+    start_load = time.time()
+    #Load data for each epoch, 32 training images, 8 validation images
+    training_data = load_im(train_manifest, 32, IMAGE_DIMENSIONS)
+    validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
+    print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
 
     history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
 
