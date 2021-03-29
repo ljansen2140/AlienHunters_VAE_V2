@@ -59,8 +59,8 @@ def sampling(args):
 
 #Make the encoder here
 encoder_input = keras.Input(shape=input_shape)
-x = layers.Conv2D(3, kernel_size=(2,2), padding='same', activation='relu')(encoder_input)
-x = layers.Conv2D(32, kernel_size=(2,2), padding='same', activation='relu', strides=(2,2))(x)
+x = layers.Conv2D(3, kernel_size=(5,5), padding='same', activation='relu')(encoder_input)
+x = layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', strides=(5,5))(x)
 x = layers.Conv2D(32, kernel_size=3, padding='same', activation='relu', strides=1)(x)
 x = layers.Conv2D(32, kernel_size=3, padding='same', activation='relu', strides=1)(x)
 
@@ -84,8 +84,8 @@ x = layers.Reshape((int(input_shape[0] / 2), int(input_shape[1] / 2), 32))(x)
 
 x = layers.Conv2DTranspose(32, kernel_size=3, padding='same', strides=1, activation='relu')(x)
 x = layers.Conv2DTranspose(32, kernel_size=3, padding='same', strides=1, activation='relu')(x)
-x = layers.Conv2DTranspose(32, kernel_size=(2,2), padding='valid', strides=(2,2), activation='relu')(x)
-decoder_output = layers.Conv2D(3, kernel_size=(2,2), padding='same', activation='sigmoid')(x)
+x = layers.Conv2DTranspose(32, kernel_size=(5,5), padding='valid', strides=(5,5), activation='relu')(x)
+decoder_output = layers.Conv2D(3, kernel_size=(5,5), padding='same', activation='sigmoid')(x)
 
 decoder = keras.Model(decoder_input, decoder_output, name="decoder")
 decoder.summary()
@@ -248,7 +248,7 @@ for epoch in range(max_epochs):
     validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
     print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
 
-    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data), batch_size=1)
+    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data), batch_size=8)
 
     if epoch in epoch_plot_step:
         plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
