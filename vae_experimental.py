@@ -50,8 +50,8 @@ if (len(sys.argv) > 1):
 
 #CONSTANTS
 
-LATENT_DIM = 1024
-HIDDEN_LAYER_DIM = 4096
+LATENT_DIM = 512
+HIDDEN_LAYER_DIM = 2048
 
 IMAGE_DIMENSIONS = (512,512)
 
@@ -76,11 +76,11 @@ x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', stri
 x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
 
 #Convolutional Layer 2
-x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv_Layer_2')(x)
+x = layers.Conv2D(64, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv_Layer_2')(x)
 x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_2')(x)
 
 #Convolutional Layer 3
-x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
+x = layers.Conv2D(64, kernel_size=1, padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
 
 #Flatten Data and Hidden Layer
 flat_layer = layers.Flatten(name='Flatten_Layer')(x)
@@ -102,16 +102,16 @@ encoder.summary()
 decoder_input = keras.Input(shape=(LATENT_DIM,))
 #Reverse Hidden Layers
 x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
-x = layers.Dense(32 * (input_shape[0] / (4*2*2)) * (input_shape[1] / (4*2*2)), name='Upscale_Layer')(x)
+x = layers.Dense(64 * (input_shape[0] / (4*2*2)) * (input_shape[1] / (4*2*2)), name='Upscale_Layer')(x)
 
 #Reshape for Conv Layers
-x = layers.Reshape((int(input_shape[0] / (4*2*2)), int(input_shape[1] / (4*2*2)), 32))(x)
+x = layers.Reshape((int(input_shape[0] / (4*2*2)), int(input_shape[1] / (4*2*2)), 64))(x)
 
 #Convolutional Layers Transpose and UpSampling
-x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose_Layer_3')(x)
+x = layers.Conv2DTranspose(64, kernel_size=1, padding='same', strides=1, activation='relu', name='Transpose_Layer_3')(x)
 
 x = layers.UpSampling2D((2,2), name="UpSample_Layer_2")(x)
-x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose_Layer_2')(x)
+x = layers.Conv2DTranspose(64, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose_Layer_2')(x)
 
 x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
 x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', name='Transpose_Layer_1')(x)
@@ -282,7 +282,7 @@ for epoch in range(max_epochs):
     validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
     print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
 
-    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data), batch_size=8)
+    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
 
     if epoch in epoch_plot_step:
         plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
