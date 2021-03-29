@@ -61,8 +61,8 @@ def sampling(args):
 encoder_input = keras.Input(shape=input_shape)
 x = layers.Conv2D(3, kernel_size=(2,2), padding='same', activation='relu')(encoder_input)
 x = layers.Conv2D(32, kernel_size=(2,2), padding='same', activation='relu', strides=(2,2))(x)
-x = layers.Conv2D(64, kernel_size=3, padding='same', activation='relu', strides=1)(x)
-x = layers.Conv2D(64, kernel_size=3, padding='same', activation='relu', strides=1)(x)
+x = layers.Conv2D(32, kernel_size=3, padding='same', activation='relu', strides=1)(x)
+x = layers.Conv2D(32, kernel_size=3, padding='same', activation='relu', strides=1)(x)
 
 flat_layer = layers.Flatten()(x)
 hidden_layer = layers.Dense(HIDDEN_LAYER_DIM)(flat_layer)
@@ -82,8 +82,8 @@ x = layers.Dense(64 * (input_shape[0] / 2) * (input_shape[1] / 2))(x)
 
 x = layers.Reshape((int(input_shape[0] / 2), int(input_shape[1] / 2), 64))(x)
 
-x = layers.Conv2DTranspose(64, kernel_size=3, padding='same', strides=1, activation='relu')(x)
-x = layers.Conv2DTranspose(64, kernel_size=3, padding='same', strides=1, activation='relu')(x)
+x = layers.Conv2DTranspose(32, kernel_size=3, padding='same', strides=1, activation='relu')(x)
+x = layers.Conv2DTranspose(32, kernel_size=3, padding='same', strides=1, activation='relu')(x)
 x = layers.Conv2DTranspose(32, kernel_size=(2,2), padding='valid', strides=(2,2), activation='relu')(x)
 decoder_output = layers.Conv2D(3, kernel_size=(2,2), padding='same', activation='sigmoid')(x)
 
@@ -98,7 +98,7 @@ z = encoder(encoder_input)
 output = decoder(z)
 vae = keras.Model(encoder_input, output, name="vae")
 vae.summary()
-#exit()
+exit()
 
 # Custom Loss Function
 # def VAE_loss_function(y_true, y_pred):
