@@ -59,24 +59,29 @@ def sampling(args):
 
 #Make the encoder here
 encoder_input = keras.Input(shape=input_shape)
-x = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='relu', name='RGB Layer')(encoder_input)
+#Convolutional Layer to make sure 3-channel RGB is represented
+x = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='relu', name='RGB_Layer')(encoder_input)
 
+#Convolutional Layer 1
+x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_1')(x)
+x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
 
-x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv Layer 1')(x)
-x = layers.MaxPooling2D((2,2), padding='same', name='Pooling Layer 1')(x)
+#Convolutional Layer 2
+x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv_Layer_2')(x)
+x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_2')(x)
 
-x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv Layer 2')(x)
-x = layers.MaxPooling2D((2,2), padding='same', name='Pooling Layer 2')(x)
+#Convolutional Layer 3
+x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
 
-x = layers.Conv2D(32, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv Layer 3')(x)
+#Flatten Data and Hidden Layer
+flat_layer = layers.Flatten(name='Flatten_Layer')(x)
+hidden_layer = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(flat_layer)
 
-flat_layer = layers.Flatten(name='Flatten Layer')(x)
-hidden_layer = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden Layer')(flat_layer)
-
+#Latent Space is Built Here
 z_mean = layers.Dense(LATENT_DIM, name='Z_MEAN')(hidden_layer)
 z_log_var = layers.Dense(LATENT_DIM, name='Z_LOG_VAR')(hidden_layer)
 
-encoder_output = layers.Lambda(sampling, output_shape=(LATENT_DIM,), name='Latent Space')([z_mean, z_log_var])
+encoder_output = layers.Lambda(sampling, output_shape=(LATENT_DIM,), name='Latent_Space')([z_mean, z_log_var])
 
 encoder = keras.Model(encoder_input, encoder_output, name="encoder")
 encoder.summary()
@@ -86,21 +91,24 @@ encoder.summary()
 
 #Make the decoder Here
 decoder_input = keras.Input(shape=(LATENT_DIM,))
-x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden Layer')(decoder_input)
-x = layers.Dense(32 * (input_shape[0] / 4) * (input_shape[1] / 4), name='Upscale Layer')(x)
+#Reverse Hidden Layers
+x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
+x = layers.Dense(32 * (input_shape[0] / 4) * (input_shape[1] / 4), name='Upscale_Layer')(x)
 
+#Reshape for Conv Layers
 x = layers.Reshape((int(input_shape[0] / 4), int(input_shape[1] / 4), 32))(x)
 
-x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose Layer 3')(x)
+#Convolutional Layers Transpose and UpSampling
+x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose_Layer_3')(x)
 
-x = layers.UpSampling2D((2,2), name="Up Sample Layer 2")(x)
-x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose Layer 2')(x)
+x = layers.UpSampling2D((2,2), name="UpSample_Layer_2")(x)
+x = layers.Conv2DTranspose(32, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose_Layer_2')(x)
 
-x = layers.UpSampling2D((2,2), name="Up Sample Layer 1")(x)
-x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', name='Transpose Layer 1')(x)
+x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
+x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', name='Transpose_Layer_1')(x)
 
 
-decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid', name='Transpose RGB Layer')(x)
+decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid', name='Transpose_RGB_Layer')(x)
 
 decoder = keras.Model(decoder_input, decoder_output, name="decoder")
 decoder.summary()
