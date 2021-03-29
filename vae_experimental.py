@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from keras import backend as K
+import sys
 
 import matplotlib.pyplot as plt
 
@@ -36,6 +37,14 @@ CIFAR10_Filenames = ['data_batch_1','data_batch_2','data_batch_3','data_batch_4'
 #pic_data = datab.load_data_sets(CIFAR10_Filenames)
 
 # ^^^ Used for CIFAR10
+
+################################################################
+#Get Args
+architecture_only = False
+if (len(sys.argv) > 1):
+    if (sys.argv[1] == "-a" or sys.argv[1] == "--arch"):
+        architecture_only = True
+        print("Only Displaying Architecture - Model will not be run!")
 
 ################################################################
 
@@ -121,7 +130,9 @@ z = encoder(encoder_input)
 output = decoder(z)
 vae = keras.Model(encoder_input, output, name="vae")
 vae.summary()
-exit()
+
+if architecture_only:
+    exit()
 
 # Custom Loss Function
 # def VAE_loss_function(y_true, y_pred):
