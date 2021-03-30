@@ -196,8 +196,8 @@ sample_data = load_im(train_manifest, number_of_pics, IMAGE_DIMENSIONS)
 sample_data_v = load_im(val_manifest, number_of_pics, IMAGE_DIMENSIONS)
 
 # Number of epochs to run for
-max_epochs = 10
-num_rows_plot = 5
+max_epochs = 10000
+num_rows_plot = 20
 
 
 #################################################################
@@ -301,4 +301,29 @@ fig_v.savefig("validation-results.png")
 fig_v.show()
 
 
+################################################################
+#STATISTICS
 
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model Loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'validation'], loc='upper left')
+#plt.show()
+
+plt.savefig("loss.png")
+
+
+
+
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Model Accuracy')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'validation'], loc='upper left')
+#plt.show()
+
+plt.savefig("acc.png")
