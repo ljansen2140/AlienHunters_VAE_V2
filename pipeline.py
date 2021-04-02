@@ -78,6 +78,7 @@ def load_manifest(manifest, dim):
 	return_data = np.empty((0,) + dim + (3,))
 	reshape_size = (-1,) + dim + (3,)
 	for obj in manifest:
+		print("Loading: " + obj)
 		im = Image.open(obj)
 		im_np = np.asarray(im)
 

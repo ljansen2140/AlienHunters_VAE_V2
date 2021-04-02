@@ -183,7 +183,9 @@ mf_file.close()
 
 
 ### Load Data From Static Location
+print("Loading Training Data...")
 training_data = load_manifest(training_manifest, IMAGE_DIMENSIONS)
+print("Loading Validation Data...")
 validation_data = load_manifest(validation_manifest, IMAGE_DIMENSIONS)
 
 
