@@ -71,3 +71,21 @@ def load_im(manifest, num_imgs, dim):
 		return_data = np.concatenate((return_data, im_np))
 
 	return return_data
+
+
+#Loads all images from a specified Manifest
+def load_manifest(manifest, dim):
+	return_data = np.empty((0,) + dim + (3,))
+	reshape_size = (-1,) + dim + (3,)
+	for obj in manifest:
+		im = Image.open(obj)
+		im_np = np.asarray(im)
+
+		im_np = im_np.reshape(reshape_size)
+
+		im_np = im_np /255.
+
+		return_data = np.concatenate((return_data, im_np))
+
+	return return_data
+

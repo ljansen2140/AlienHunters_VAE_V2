@@ -4,6 +4,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from keras import backend as K
 import sys
+import pickle
+import os
 
 import matplotlib.pyplot as plt
 
@@ -21,9 +23,9 @@ from pipeline import load_im
 #MNIST
 from keras.datasets import mnist
 import numpy as np
-(x_train, _), (x_test, _) = mnist.load_data()
-x_train = x_train.astype('float32') / 255.
-x_test = x_test.astype('float32') / 255.
+# (x_train, _), (x_test, _) = mnist.load_data()
+# x_train = x_train.astype('float32') / 255.
+# x_test = x_test.astype('float32') / 255.
 
 
 #CIFAR10 Filename List for importer
@@ -34,17 +36,24 @@ CIFAR10_Filenames = ['data_batch_1','data_batch_2','data_batch_3','data_batch_4'
 # TODO: Double check the data returned is what is expected
 # load_data_sets(file_list, data_id)
 # Default data ID is 3 for Cats - See data_builder.py for details
-#pic_data = datab.load_data_sets(CIFAR10_Filenames)
+
+# pic_data = datab.load_data_sets(CIFAR10_Filenames)
 
 # ^^^ Used for CIFAR10
 
 ################################################################
 #Get Args
 architecture_only = False
+reload_previous = False
+start_at_epoch = 0
 if (len(sys.argv) > 1):
     if (sys.argv[1] == "-a" or sys.argv[1] == "--arch"):
         architecture_only = True
         print("Only Displaying Architecture - Model will not be run!")
+    if (sys.argv[1] == "-l" or sys.argv[1] == "--load"):
+        reload_previous = True
+        start_at_epoch = int(sys.argv[2])
+        print("Restarting Model at Epoch: " + str(start_at_epoch))
 
 ################################################################
 
@@ -128,6 +137,8 @@ decoder.summary()
 #Make the VAE here
 z = encoder(encoder_input)
 output = decoder(z)
+
+
 vae = keras.Model(encoder_input, output, name="vae")
 vae.summary()
 
@@ -150,33 +161,50 @@ vae.compile(optimizer='adam')
 
 #Setup training and validation data
 #CIFAR10 DATA
-#training_data = pic_data[:4000]
-#validation_data = pic_data[4000:]
+# training_data = pic_data[:4000]
+# validation_data = pic_data[4000:]
 
 
-train_count = 32
-val_count = 8
+# train_count = 32
+# val_count = 8
 
 
 #Load Manifest
-mf_file = open("airport.files", "r")
+mf_file = open("train.manifest", "r")
 data = mf_file.read()
-objects = data.split(" ")
+training_manifest = data.split(" ")
+mf_file.close()
 
+#Load Validation Manifest
+mf_file = open("val.manifest", "r")
+data = mf_file.read()
+validation_manifest = data.split(" ")
+mf_file.close()
+
+
+### Load Data From Static Location
+training_data = load_manifest(train_manifest, IMAGE_DIMENSIONS)
+validation_data = load_manifest(validation_manifest, IMAGE_DIMENSIONS)
+
+
+
+###
+#This is all unneccessary now... V
+# Only useful for OTF loading
 
 #Split Manifest into Train and Val
-val_target = "val/airport/"
-train_target = "train/airport/"
+# val_target = "val/airport/"
+# train_target = "train/airport/"
 
-train_manifest = []
-val_manifest = []
+# train_manifest = []
+# val_manifest = []
 
 #Add all targets to respective manifests
-for item in objects:
-    if val_target in item:
-        val_manifest.append(item)
-    if train_target in item:
-        train_manifest.append(item)
+# for item in objects:
+#     if val_target in item:
+#         val_manifest.append(item)
+#     if train_target in item:
+#         train_manifest.append(item)
 
 #train_manifest: Contains all items that can be drawn as training data
 #val_manifest: Contains all items that can be drawn as validation data
@@ -190,34 +218,35 @@ for item in objects:
 #CONFIG-VARIABLES
 #Select static Sample data ranging [x:y-1]
 number_of_pics = 10
-#sample_data = training_data[0:number_of_pics]
-#sample_data_v = validation_data[0:number_of_pics]
-sample_data = load_im(train_manifest, number_of_pics, IMAGE_DIMENSIONS)
-sample_data_v = load_im(val_manifest, number_of_pics, IMAGE_DIMENSIONS)
+sample_data = training_data[0:number_of_pics]
+sample_data_v = validation_data[0:number_of_pics]
+
+# sample_data = load_im(train_manifest, number_of_pics, IMAGE_DIMENSIONS)
+# sample_data_v = load_im(val_manifest, number_of_pics, IMAGE_DIMENSIONS)
+
+
 
 # Number of epochs to run for
-max_epochs = 10000
+max_epochs = 260
 num_rows_plot = 20
-
 
 #################################################################
 
 
 
 
-
 ################################################################
-#PLOTTING CONFIGURATION
+#PLOTTING FUNCTIONS
 
 # Create Plotter Function
-def plot_step(vae, target_ims, g, n, plot_i):
+def plot_step(plot_data, g, n, plot_i):
     #Function here
     # Plot and display result
 
     # Simulate Predictions
     # Run encoder and grab variable [2] (Latent data representation)
     # Run decoder on latent space
-    result = vae.predict(target_ims)
+    result = plot_data
     offset = n*(plot_i+1)
     g[offset].set_ylabel('EPOCH {}'.format(plot_i*(max_epochs//num_rows_plot)))
     for i in range(n):
@@ -227,6 +256,14 @@ def plot_step(vae, target_ims, g, n, plot_i):
         g[offset+i].set_yticklabels([])
         
 
+#Returns only the numpy array representing the predicted image, should be reconstructed at the end
+def gen_sample(vae, input_ims):
+    result = vae.predict(input_ims)
+    return result
+
+
+################################################################
+#PLOTTING CONFIGURATION
 
 # Number of Rows to plot
 epoch_plot_step = [i for i in range(0,max_epochs,max_epochs // num_rows_plot)]
@@ -262,33 +299,80 @@ for i in range(number_of_pics):
 
 ################################################################
 
+#Setup Checkpoint Callbacks
+checkpoint_path = "model/model.ckpt"
+checkpoint_dir = os.path.dirname(checkpoint_path)
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1)
+
+
+#If plot has been checkpointed, load it here
+
 
 #TRAINING HAPPENS HERE
 
-#TODO: Remove this maybe?
-import time
 
 plot_iter = 0
-for epoch in range(max_epochs):
+plot_data = np.empty((0,number_of_pics) + IMAGE_DIMENSIONS + (3,))
+plot_data_v = np.empty((0,number_of_pics) + IMAGE_DIMENSIONS + (3,))
+plot_reshape = (-1,number_of_pics) + IMAGE_DIMENSIONS + (3,)
+
+#reload old plots if asked
+if reload_previous:
+    plot_data = np.load("training_plot_data_checkpoint.npy")
+    plot_data_v = np.load("validation_plot_data_checkpoint.npy")
+
+if reload_previous:
+    #Reload Model From Checkpoint
+    vae.load_weights(checkpoint_path)
+    print("Loaded Last Checkpoint for VAE")
+
+#start_at_epoch, defaults to 0, will start at a later epoch if specified by command line args
+for epoch in range(start_at_epoch, max_epochs):
 
     #!!!
     #TODO: Add asynchronous behavior?
     #NOTE: Current load times of 48 images is ~19.5 seconds 
 
     #TODO: Remove Timing functions?
-    start_load = time.time()
+    #start_load = time.time()
     #Load data for each epoch, 32 training images, 8 validation images
-    training_data = load_im(train_manifest, 32, IMAGE_DIMENSIONS)
-    validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
-    print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
-
-    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
+    #training_data = load_im(train_manifest, 32, IMAGE_DIMENSIONS)
+    #validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
+    #print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
+    print("Running Epoch: " + str(epoch))
+    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data), callbacks=[cp_callback])
 
     if epoch in epoch_plot_step:
-        plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
-        plot_step(vae, sample_data_v, grid_v, number_of_pics, plot_iter)
-        plot_iter += 1
+        #plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
+        #plot_step(vae, sample_data_v, grid_v, number_of_pics, plot_iter)
+        sp = gen_sample(vae, sample_data)
+        sp = sp.reshape(plot_reshape)
+        plot_data = np.concatenate((plot_data, sp))
 
+        sp = gen_sample(vae, sample_data_v)
+        sp = sp.reshape(plot_reshape)
+        plot_data_v = np.concatenate((plot_data_v, sp))
+        
+        plot_iter += 1
+        print("Epoch " + str(epoch) + " Plotted.")
+        #Save Numpy Data Here
+        print("-----Saving Plot Data-----")
+        np.save("training_plot_data_checkpoint.npy", plot_data)
+        np.save("validation_plot_data_checkpoint.npy", plot_data_v)
+        
+
+
+################################################################
+#GENERATE IMAGES HERE
+i = 0
+for im_row in plot_data:
+    plot_step(im_row, grid, number_of_pics, i)
+    i += 1
+
+i = 0
+for im_row_v in plot_data_v:
+    plot_step(im_row_v, grid_v, number_of_pics, i)
+    i += 1
 
 
 ################################################################
@@ -303,6 +387,9 @@ fig_v.show()
 
 ################################################################
 #STATISTICS
+
+#FIXME: Stats not working???
+exit()
 
 
 plt.plot(history.history['loss'])
