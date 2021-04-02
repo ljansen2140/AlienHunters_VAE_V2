@@ -183,7 +183,7 @@ mf_file.close()
 
 
 ### Load Data From Static Location
-training_data = load_manifest(train_manifest, IMAGE_DIMENSIONS)
+training_data = load_manifest(training_manifest, IMAGE_DIMENSIONS)
 validation_data = load_manifest(validation_manifest, IMAGE_DIMENSIONS)
 
 
