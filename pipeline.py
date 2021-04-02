@@ -75,8 +75,8 @@ def load_im(manifest, num_imgs, dim):
 
 #Loads all images from a specified Manifest
 def load_manifest(manifest, dim):
-	return_data = np.empty((0,) + dim + (3,))
-	reshape_size = (-1,) + dim + (3,)
+	#return_data = np.empty((0,) + dim + (3,))
+	#reshape_size = dim + (3,)
 	image_list = []
 	for obj in manifest:
 		if obj == "":
@@ -85,7 +85,7 @@ def load_manifest(manifest, dim):
 		im = Image.open(obj)
 		im_np = np.asarray(im)
 
-		im_np = im_np.reshape(reshape_size)
+		#im_np = im_np.reshape(reshape_size)
 
 		im_np = im_np /255.
 
