@@ -77,6 +77,7 @@ def load_im(manifest, num_imgs, dim):
 def load_manifest(manifest, dim):
 	return_data = np.empty((0,) + dim + (3,))
 	reshape_size = (-1,) + dim + (3,)
+	image_list = []
 	for obj in manifest:
 		print("Loading: " + obj)
 		im = Image.open(obj)
@@ -86,7 +87,11 @@ def load_manifest(manifest, dim):
 
 		im_np = im_np /255.
 
-		return_data = np.concatenate((return_data, im_np))
+		#NOTE: Concatenate is slow and BAD, do not use!!!
+		#return_data = np.concatenate((return_data, im_np))
 
+		image_list.append(im_np)
+
+	return_data = np.array(image_list)
 	return return_data
 
