@@ -79,6 +79,8 @@ def load_manifest(manifest, dim):
 	reshape_size = (-1,) + dim + (3,)
 	image_list = []
 	for obj in manifest:
+		if obj == "":
+			continue
 		print("Loading: " + obj)
 		im = Image.open(obj)
 		im_np = np.asarray(im)
