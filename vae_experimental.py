@@ -395,8 +395,12 @@ fig_v.show()
 #STATISTICS
 
 #FIXME: Stats not working???
-exit()
 
+encoder.save("VAE_encoder.h5") 
+decoder.save("VAE_decoder.h5") 
+vae.save("VAE.h5")
+
+exit()
 
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
