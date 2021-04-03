@@ -37,7 +37,7 @@ CIFAR10_Filenames = ['data_batch_1','data_batch_2','data_batch_3','data_batch_4'
 # load_data_sets(file_list, data_id)
 # Default data ID is 3 for Cats - See data_builder.py for details
 
-# pic_data = datab.load_data_sets(CIFAR10_Filenames)
+pic_data = datab.load_data_sets(CIFAR10_Filenames)
 
 # ^^^ Used for CIFAR10
 
@@ -59,10 +59,10 @@ if (len(sys.argv) > 1):
 
 #CONSTANTS
 
-LATENT_DIM = 512
+LATENT_DIM = 32
 HIDDEN_LAYER_DIM = 2048
 
-IMAGE_DIMENSIONS = (512,512)
+IMAGE_DIMENSIONS = (32,32)
 
 input_shape = IMAGE_DIMENSIONS + (3,)
 
@@ -111,10 +111,10 @@ encoder.summary()
 decoder_input = keras.Input(shape=(LATENT_DIM,))
 #Reverse Hidden Layers
 #x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
-x = layers.Dense(128 * 16 * 16, name='Upscale_Layer')(decoder_input)
+x = layers.Dense(128 * 1 * 1, name='Upscale_Layer')(decoder_input)
 
 #Reshape for Conv Layers
-x = layers.Reshape((16, 16, 128))(x)
+x = layers.Reshape((1, 1, 128))(x)
 
 #Convolutional Layers Transpose and UpSampling
 x = layers.Conv2DTranspose(64, kernel_size=1, padding='same', strides=1, activation='relu', name='Transpose_Layer_3')(x)
@@ -161,8 +161,8 @@ vae.compile(optimizer='adam')
 
 #Setup training and validation data
 #CIFAR10 DATA
-# training_data = pic_data[:4000]
-# validation_data = pic_data[4000:]
+training_data = pic_data[:4000]
+validation_data = pic_data[4000:]
 
 
 # train_count = 32
@@ -170,16 +170,16 @@ vae.compile(optimizer='adam')
 
 
 #Load Manifest
-mf_file = open("train.manifest", "r")
-data = mf_file.read()
-training_manifest = data.split(" ")
-mf_file.close()
+# mf_file = open("train.manifest", "r")
+# data = mf_file.read()
+# training_manifest = data.split(" ")
+# mf_file.close()
 
 #Load Validation Manifest
-mf_file = open("val.manifest", "r")
-data = mf_file.read()
-validation_manifest = data.split(" ")
-mf_file.close()
+# mf_file = open("val.manifest", "r")
+# data = mf_file.read()
+# validation_manifest = data.split(" ")
+# mf_file.close()
 
 
 ### Load Data From Static Location
@@ -220,19 +220,19 @@ mf_file.close()
 #CONFIG-VARIABLES
 #Select static Sample data ranging [x:y-1]
 number_of_pics = 10
-# sample_data = training_data[0:number_of_pics]
-# sample_data_v = validation_data[0:number_of_pics]
+sample_data = training_data[0:number_of_pics]
+sample_data_v = validation_data[0:number_of_pics]
 
 # sample_data = load_im(train_manifest, number_of_pics, IMAGE_DIMENSIONS)
 # sample_data_v = load_im(val_manifest, number_of_pics, IMAGE_DIMENSIONS)
 
-sample_data = load_manifest_count(training_manifest, IMAGE_DIMENSIONS, 10)
-sample_data_v = load_manifest_count(validation_manifest, IMAGE_DIMENSIONS, 10)
+# sample_data = load_manifest_count(training_manifest, IMAGE_DIMENSIONS, 10)
+# sample_data_v = load_manifest_count(validation_manifest, IMAGE_DIMENSIONS, 10)
 
 
 # Number of epochs to run for
-max_epochs = 10000
-num_rows_plot = 20
+max_epochs = 20
+num_rows_plot = 10
 
 #################################################################
 
@@ -342,8 +342,8 @@ for epoch in range(start_at_epoch, max_epochs):
     #Load data for each epoch, 32 training images, 8 validation images
     #training_data = load_im(train_manifest, 32, IMAGE_DIMENSIONS)
     #validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
-    training_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 32)
-    validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 8)
+    # training_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 32)
+    # validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 8)
     #print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
     print("Running Epoch: " + str(epoch))
     history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data), callbacks=[cp_callback])
