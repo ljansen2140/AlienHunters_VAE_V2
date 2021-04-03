@@ -398,7 +398,7 @@ fig_v.show()
 
 encoder.save("VAE_encoder.h5") 
 decoder.save("VAE_decoder.h5") 
-vae.save("VAE.h5")
+vae.save("VAE.h5") =
 
 exit()
 
