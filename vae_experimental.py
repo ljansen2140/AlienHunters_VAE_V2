@@ -396,9 +396,9 @@ fig_v.show()
 
 #FIXME: Stats not working???
 
-encoder.save("VAE_encoder.h5") 
-decoder.save("VAE_decoder.h5") 
-vae.save("VAE.h5") =
+encoder.save('model/VAE_encoder.h5') 
+decoder.save('model/VAE_decoder.h5') 
+vae.save('model/VAE.h5')
 
 exit()
 
