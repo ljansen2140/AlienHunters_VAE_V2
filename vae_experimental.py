@@ -17,7 +17,7 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 import data_builder as datab
 
 #Data Pipeline for FMOW dataset: ./pipeline.py
-from pipeline import load_im, load_manifest
+from pipeline import load_im, load_manifest, load_manifest_count, load_manifest_rand
 
 
 #MNIST
