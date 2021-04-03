@@ -85,19 +85,19 @@ x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', stri
 x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
 
 #Convolutional Layer 2
-x = layers.Conv2D(64, kernel_size=2, padding='same', activation='relu', strides=1, name='Conv_Layer_2')(x)
+x = layers.Conv2D(64, kernel_size=2, padding='same', activation='relu', strides=2, name='Conv_Layer_2')(x)
 x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_2')(x)
 
 #Convolutional Layer 3
-x = layers.Conv2D(64, kernel_size=1, padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
+x = layers.Conv2D(128, kernel_size=1, padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
 
 #Flatten Data and Hidden Layer
 flat_layer = layers.Flatten(name='Flatten_Layer')(x)
-hidden_layer = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(flat_layer)
+#hidden_layer = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(flat_layer)
 
 #Latent Space is Built Here
-z_mean = layers.Dense(LATENT_DIM, name='Z_MEAN')(hidden_layer)
-z_log_var = layers.Dense(LATENT_DIM, name='Z_LOG_VAR')(hidden_layer)
+z_mean = layers.Dense(LATENT_DIM, name='Z_MEAN')(flat_layer)
+z_log_var = layers.Dense(LATENT_DIM, name='Z_LOG_VAR')(flat_layer)
 
 encoder_output = layers.Lambda(sampling, output_shape=(LATENT_DIM,), name='Latent_Space')([z_mean, z_log_var])
 
@@ -110,17 +110,17 @@ encoder.summary()
 #Make the decoder Here
 decoder_input = keras.Input(shape=(LATENT_DIM,))
 #Reverse Hidden Layers
-x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
-x = layers.Dense(64 * (input_shape[0] / (4*2*2)) * (input_shape[1] / (4*2*2)), name='Upscale_Layer')(x)
+#x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
+x = layers.Dense(128 * 16 * 16, name='Upscale_Layer')(decoder_input)
 
 #Reshape for Conv Layers
-x = layers.Reshape((int(input_shape[0] / (4*2*2)), int(input_shape[1] / (4*2*2)), 64))(x)
+x = layers.Reshape((16, 16, 128))(x)
 
 #Convolutional Layers Transpose and UpSampling
 x = layers.Conv2DTranspose(64, kernel_size=1, padding='same', strides=1, activation='relu', name='Transpose_Layer_3')(x)
 
 x = layers.UpSampling2D((2,2), name="UpSample_Layer_2")(x)
-x = layers.Conv2DTranspose(64, kernel_size=2, padding='same', strides=1, activation='relu', name='Transpose_Layer_2')(x)
+x = layers.Conv2DTranspose(64, kernel_size=2, padding='same', strides=2, activation='relu', name='Transpose_Layer_2')(x)
 
 x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
 x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', name='Transpose_Layer_1')(x)
