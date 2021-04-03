@@ -105,7 +105,7 @@ def load_manifest_count(manifest, dim, count):
 		obj = manifest[i]
 		if obj == "":
 			continue
-		print("Loading: " + obj)
+		#print("Loading: " + obj)
 		im = Image.open(obj)
 		im_np = np.asarray(im)
 
@@ -131,7 +131,7 @@ def load_manifest_rand(manifest, dim, count):
 	for i in range(count):
 		choice = random.randint(0, max_rand)
 		obj = manifest[random.randint(0, max_rand)]
-		print("Loading: " + obj)
+		#print("Loading: " + obj)
 		im = Image.open(obj)
 		im_np = np.asarray(im)
 
