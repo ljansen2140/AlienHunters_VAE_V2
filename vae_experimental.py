@@ -183,10 +183,10 @@ mf_file.close()
 
 
 ### Load Data From Static Location
-print("Loading Training Data...")
-training_data = load_manifest(training_manifest, IMAGE_DIMENSIONS)
-print("Loading Validation Data...")
-validation_data = load_manifest(validation_manifest, IMAGE_DIMENSIONS)
+# print("Loading Training Data...")
+# training_data = load_manifest(training_manifest, IMAGE_DIMENSIONS)
+# print("Loading Validation Data...")
+# validation_data = load_manifest(validation_manifest, IMAGE_DIMENSIONS)
 
 
 
@@ -220,16 +220,18 @@ validation_data = load_manifest(validation_manifest, IMAGE_DIMENSIONS)
 #CONFIG-VARIABLES
 #Select static Sample data ranging [x:y-1]
 number_of_pics = 10
-sample_data = training_data[0:number_of_pics]
-sample_data_v = validation_data[0:number_of_pics]
+# sample_data = training_data[0:number_of_pics]
+# sample_data_v = validation_data[0:number_of_pics]
 
 # sample_data = load_im(train_manifest, number_of_pics, IMAGE_DIMENSIONS)
 # sample_data_v = load_im(val_manifest, number_of_pics, IMAGE_DIMENSIONS)
 
+sample_data = load_manifest_count(train_manifest, IMAGE_DIMENSIONS, 10)
+sample_data_v = load_manifest_count(validation_manifest, IMAGE_DIMENSIONS, 10)
 
 
 # Number of epochs to run for
-max_epochs = 260
+max_epochs = 10000
 num_rows_plot = 20
 
 #################################################################
@@ -340,6 +342,8 @@ for epoch in range(start_at_epoch, max_epochs):
     #Load data for each epoch, 32 training images, 8 validation images
     #training_data = load_im(train_manifest, 32, IMAGE_DIMENSIONS)
     #validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
+    training_data = load_manifest_rand(train_manifest, IMAGE_DIMENSIONS, 32)
+    validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 8)
     #print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
     print("Running Epoch: " + str(epoch))
     history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data), callbacks=[cp_callback])
