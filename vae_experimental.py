@@ -82,21 +82,23 @@ x = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='relu', name=
 
 #Convolutional Layer 1
 x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(2,2), name='Conv_Layer_1')(x)
-x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
+#x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
 
 #Convolutional Layer 2
 x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_2')(x)
-x = layers.MaxPooling2D((4,4), padding='same', name='Pooling_Layer_2')(x)
+#x = layers.MaxPooling2D((4,4), padding='same', name='Pooling_Layer_2')(x)
 
 #Convolutional Layer 3
-x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
-x = layers.MaxPooling2D((4,4), padding='same', name='Pooling_Layer_3')(x)
+x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_3')(x)
+#x = layers.MaxPooling2D((4,4), padding='same', name='Pooling_Layer_3')(x)
 
 #Convolutional Layer 4
-#x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_4')(x)
+x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_4')(x)
 
 #Convolutional Layer 5
-#x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(2,2), name='Conv_Layer_5')(x)
+x = layers.Conv2D(64, kernel_size=(2,2), padding='same', activation='relu', strides=(2,2), name='Conv_Layer_5')(x)
+
+x = layers.Conv2D(64, kernel_size=1, padding='same', activation='relu', strides=1, name='Conv_Layer_6')(x)
 
 #Flatten Data and Hidden Layer
 flat_layer = layers.Flatten(name='Flatten_Layer')(x)
@@ -123,18 +125,20 @@ x = layers.Dense(64 * 2 * 2, name='Upscale_Layer')(decoder_input)
 #Reshape for Conv Layers
 x = layers.Reshape((2, 2, 64))(x)
 
-#x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(2,2), activation='relu', name='TP_Layer_5')(x)
+x = layers.Conv2DTranspose(64, kernel_size=1, padding='same', strides=1, activation='relu', name='TP_Layer_6')(x)
 
-#x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_4')(x)
+x = layers.Conv2DTranspose(64, kernel_size=(2,2), padding='same', strides=(2,2), activation='relu', name='TP_Layer_5')(x)
+
+x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_4')(x)
 
 #Convolutional Layers Transpose and UpSampling
-x = layers.UpSampling2D((4,4), name="UpSample_Layer_3")(x)
-x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=1, activation='relu', name='TP_Layer_3')(x)
+#x = layers.UpSampling2D((4,4), name="UpSample_Layer_3")(x)
+x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_3')(x)
 
-x = layers.UpSampling2D((4,4), name="UpSample_Layer_2")(x)
+#x = layers.UpSampling2D((4,4), name="UpSample_Layer_2")(x)
 x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_2')(x)
 
-x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
+#x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
 x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='same', strides=(2,2), activation='relu', name='Transpose_Layer_1')(x)
 
 
