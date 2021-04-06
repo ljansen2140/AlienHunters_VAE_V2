@@ -388,11 +388,10 @@ for epoch in range(start_at_epoch, max_epochs):
         print("-----Saving Model Weights-----")
         vae.save_weights(checkpoint_path)
         print("Saved Mode Step: " + str(epoch))
-
-        #Garbage Collection
-        print("Clearing Memory...")
-        tf.keras.backend.clear_session()
-        gc.collect()
+    #Garbage Collection
+    print("Clearing Memory...")
+    tf.keras.backend.clear_session()
+    gc.collect()
 
 
 ################################################################
