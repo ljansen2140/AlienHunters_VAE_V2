@@ -59,8 +59,8 @@ if (len(sys.argv) > 1):
 
 #CONSTANTS
 
-LATENT_DIM = 512
-HIDDEN_LAYER_DIM = 2048
+LATENT_DIM = 1024
+#HIDDEN_LAYER_DIM = 128
 
 IMAGE_DIMENSIONS = (512,512)
 
@@ -81,15 +81,21 @@ encoder_input = keras.Input(shape=input_shape)
 x = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='relu', name='RGB_Layer')(encoder_input)
 
 #Convolutional Layer 1
-x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_1')(x)
-x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
+x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(2,2), name='Conv_Layer_1')(x)
+#x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
 
 #Convolutional Layer 2
-x = layers.Conv2D(64, kernel_size=2, padding='same', activation='relu', strides=2, name='Conv_Layer_2')(x)
-x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_2')(x)
+x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_2')(x)
+#x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_2')(x)
 
 #Convolutional Layer 3
-x = layers.Conv2D(128, kernel_size=1, padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
+x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_3')(x)
+
+#Convolutional Layer 4
+x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_4')(x)
+
+#Convolutional Layer 5
+x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(2,2), name='Conv_Layer_5')(x)
 
 #Flatten Data and Hidden Layer
 flat_layer = layers.Flatten(name='Flatten_Layer')(x)
@@ -111,19 +117,23 @@ encoder.summary()
 decoder_input = keras.Input(shape=(LATENT_DIM,))
 #Reverse Hidden Layers
 #x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
-x = layers.Dense(128 * 16 * 16, name='Upscale_Layer')(decoder_input)
+x = layers.Dense(64 * 2 * 2, name='Upscale_Layer')(decoder_input)
 
 #Reshape for Conv Layers
-x = layers.Reshape((16, 16, 128))(x)
+x = layers.Reshape((2, 2, 64))(x)
+
+x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(2,2), activation='relu', name='TP_Layer_5')(x)
+
+x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_4')(x)
 
 #Convolutional Layers Transpose and UpSampling
-x = layers.Conv2DTranspose(64, kernel_size=1, padding='same', strides=1, activation='relu', name='Transpose_Layer_3')(x)
+x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_3')(x)
 
-x = layers.UpSampling2D((2,2), name="UpSample_Layer_2")(x)
-x = layers.Conv2DTranspose(64, kernel_size=2, padding='same', strides=2, activation='relu', name='Transpose_Layer_2')(x)
+#x = layers.UpSampling2D((2,2), name="UpSample_Layer_2")(x)
+x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_2')(x)
 
-x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
-x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', name='Transpose_Layer_1')(x)
+#x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
+x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='same', strides=(2,2), activation='relu', name='Transpose_Layer_1')(x)
 
 
 decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid', name='Transpose_RGB_Layer')(x)
@@ -226,12 +236,12 @@ number_of_pics = 10
 # sample_data = load_im(train_manifest, number_of_pics, IMAGE_DIMENSIONS)
 # sample_data_v = load_im(val_manifest, number_of_pics, IMAGE_DIMENSIONS)
 
-sample_data = load_manifest_count(training_manifest, IMAGE_DIMENSIONS, 10)
-sample_data_v = load_manifest_count(validation_manifest, IMAGE_DIMENSIONS, 10)
+sample_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 10)
+sample_data_v = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 10)
 
 
 # Number of epochs to run for
-max_epochs = 10000
+max_epochs = 100
 num_rows_plot = 20
 
 #################################################################
