@@ -251,7 +251,7 @@ sample_data_v = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 10)
 # Number of epochs to run for
 max_epochs = 2000
 num_rows_plot = 20
-epochs_per_plot = 100
+
 
 #################################################################
 
@@ -350,8 +350,7 @@ if reload_previous:
     print("Loaded Last Checkpoint for VAE")
 
 #start_at_epoch, defaults to 0, will start at a later epoch if specified by command line args
-#for epoch in range(start_at_epoch, max_epochs):
-for epoch in range(start_at_epoch, num_rows_plot):
+for epoch in range(start_at_epoch, max_epochs):
 
     #!!!
     #TODO: Add asynchronous behavior?
@@ -366,34 +365,34 @@ for epoch in range(start_at_epoch, num_rows_plot):
     validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 8)
     #print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
     print("Running Epoch: " + str(epoch))
-    history = vae.fit(training_data, training_data, epochs=epochs_per_plot, validation_data=(validation_data, validation_data))
+    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
 
-    #if epoch in epoch_plot_step:
-    #plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
-    #plot_step(vae, sample_data_v, grid_v, number_of_pics, plot_iter)
-    sp = gen_sample(vae, sample_data)
-    sp = sp.reshape(plot_reshape)
-    plot_data = np.concatenate((plot_data, sp))
+    if epoch in epoch_plot_step:
+        #plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
+        #plot_step(vae, sample_data_v, grid_v, number_of_pics, plot_iter)
+        sp = gen_sample(vae, sample_data)
+        sp = sp.reshape(plot_reshape)
+        plot_data = np.concatenate((plot_data, sp))
 
-    sp = gen_sample(vae, sample_data_v)
-    sp = sp.reshape(plot_reshape)
-    plot_data_v = np.concatenate((plot_data_v, sp))
-    
-    plot_iter += 1
-    print("Epoch " + str(epoch) + " Plotted.")
-    #Save Numpy Data Here
-    print("-----Saving Plot Data-----")
-    np.save("training_plot_data_checkpoint.npy", plot_data)
-    np.save("validation_plot_data_checkpoint.npy", plot_data_v)
+        sp = gen_sample(vae, sample_data_v)
+        sp = sp.reshape(plot_reshape)
+        plot_data_v = np.concatenate((plot_data_v, sp))
+        
+        plot_iter += 1
+        print("Epoch " + str(epoch) + " Plotted.")
+        #Save Numpy Data Here
+        print("-----Saving Plot Data-----")
+        np.save("training_plot_data_checkpoint.npy", plot_data)
+        np.save("validation_plot_data_checkpoint.npy", plot_data_v)
 
-    print("-----Saving Model Weights-----")
-    vae.save_weights(checkpoint_path)
-    print("Saved Mode Step: " + str(epoch))
+        print("-----Saving Model Weights-----")
+        vae.save_weights(checkpoint_path)
+        print("Saved Mode Step: " + str(epoch))
 
-    #Garbage Collection
-    print("Clearing Memory...")
-    tf.keras.backend.clear_session()
-    gc.collect()
+        #Garbage Collection
+        print("Clearing Memory...")
+        tf.keras.backend.clear_session()
+        gc.collect()
 
 
 ################################################################
