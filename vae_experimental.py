@@ -81,7 +81,7 @@ encoder_input = keras.Input(shape=input_shape)
 x = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='relu', name='RGB_Layer')(encoder_input)
 
 #Convolutional Layer 1
-x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=1, name='Conv_Layer_1')(x)
+x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_1')(x)
 #x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
 
 #Convolutional Layer 2
@@ -121,10 +121,10 @@ encoder.summary()
 decoder_input = keras.Input(shape=(LATENT_DIM,))
 #Reverse Hidden Layers
 x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
-x = layers.Dense(64 * 64 * 64, name='Upscale_Layer')(x)
+x = layers.Dense(64 * 16 * 16, name='Upscale_Layer')(x)
 
 #Reshape for Conv Layers
-x = layers.Reshape((64, 64, 64))(x)
+x = layers.Reshape((16, 16, 64))(x)
 
 #x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_6')(x)
 
@@ -140,7 +140,7 @@ x = layers.Conv2DTranspose(64, kernel_size=(2,2), padding='same', strides=(2,2),
 x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_2')(x)
 
 #x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
-x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='same', strides=1, activation='relu', name='Transpose_Layer_1')(x)
+x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='Transpose_Layer_1')(x)
 
 
 decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid', name='Transpose_RGB_Layer')(x)
