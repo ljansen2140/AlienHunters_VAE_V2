@@ -6,6 +6,7 @@ from keras import backend as K
 import sys
 import pickle
 import os
+import gc
 
 import matplotlib.pyplot as plt
 
@@ -323,8 +324,8 @@ for i in range(number_of_pics):
 
 #Setup Checkpoint Callbacks
 checkpoint_path = "model/model.ckpt"
-checkpoint_dir = os.path.dirname(checkpoint_path)
-cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1)
+#checkpoint_dir = os.path.dirname(checkpoint_path)
+#cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1)
 
 
 #If plot has been checkpointed, load it here
@@ -350,7 +351,7 @@ if reload_previous:
 
 #start_at_epoch, defaults to 0, will start at a later epoch if specified by command line args
 #for epoch in range(start_at_epoch, max_epochs):
-for epoch in range(num_rows_plot):
+for epoch in range(start_at_epoch, num_rows_plot):
 
     #!!!
     #TODO: Add asynchronous behavior?
@@ -365,7 +366,7 @@ for epoch in range(num_rows_plot):
     validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 8)
     #print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
     print("Running Epoch: " + str(epoch))
-    history = vae.fit(training_data, training_data, epochs=epochs_per_plot, validation_data=(validation_data, validation_data), callbacks=[cp_callback])
+    history = vae.fit(training_data, training_data, epochs=epochs_per_plot, validation_data=(validation_data, validation_data))
 
     #if epoch in epoch_plot_step:
     #plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
@@ -384,7 +385,15 @@ for epoch in range(num_rows_plot):
     print("-----Saving Plot Data-----")
     np.save("training_plot_data_checkpoint.npy", plot_data)
     np.save("validation_plot_data_checkpoint.npy", plot_data_v)
-        
+
+    print("-----Saving Model Weights-----")
+    vae.save_weights(checkpoint_path)
+    print("Saved Mode Step: " + str(epoch))
+
+    #Garbage Collection
+    print("Clearing Memory...")
+    tf.keras.backend.clear_session()
+    gc.collect()
 
 
 ################################################################
