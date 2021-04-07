@@ -249,7 +249,7 @@ sample_data_v = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 10)
 
 
 # Number of epochs to run for
-max_epochs = 2000
+max_epochs = 10000
 num_rows_plot = 20
 
 
