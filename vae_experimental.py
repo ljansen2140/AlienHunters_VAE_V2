@@ -408,6 +408,14 @@ for im_row_v in plot_data_v:
 
 
 ################################################################
+#SAVE MODELS HERE
+
+encoder.save('model/VAE_encoder') 
+decoder.save('model/VAE_decoder') 
+vae.save('model/VAE_full')
+
+
+################################################################
 #SAVE IMAGE RESULTS
 
 fig.savefig("training-results.png")
