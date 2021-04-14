@@ -100,7 +100,7 @@ es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=3)
 
 
 # Model training
-history = model.fit(X_train, y_train, epochs=20, batch_size=32, validation_data=(X_test, y_test), callbacks=[es])
+history = model.fit(X_train, y_train, epochs=5, batch_size=32, validation_data=(X_test, y_test), callbacks=[es])
 
 
 # Saving/loading model
@@ -109,15 +109,15 @@ model = load_model('CNN_CIFAR.h5')
 
 
 # Model evaluation
-plt.title('Accuracy Score')
-plt.plot(history.history['acc'])
-plt.plot(history.history['val_acc'])
-plt.show()
+#plt.title('Accuracy Score')
+#plt.plot(history.history['acc'])
+#plt.plot(history.history['val_acc'])
+#plt.show()
 
-plt.title('Loss Values')
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.show()
+#plt.title('Loss Values')
+#plt.plot(history.history['loss'])
+#plt.plot(history.history['val_loss'])
+#plt.show()
 
 
 # Predicting test data
@@ -128,13 +128,13 @@ y_test = one_hot_encoder.inverse_transform(y_test)
 
 
 # Creating confusion matrix
-cm = confusion_matrix(y_test, predictions)
+#cm = confusion_matrix(y_test, predictions)
 
-plt.figure(figsize=(9,9))
-sns.heatmap(cm, cbar=False, xticklabels=labels, yticklabels=labels, fmt='d', annot=True, cmap=plt.cm.Blues)
-plt.xlabel('Predicted')
-plt.ylabel('Actual')
-plt.show()
+#plt.figure(figsize=(9,9))
+#sns.heatmap(cm, cbar=False, xticklabels=labels, yticklabels=labels, fmt='d', annot=True, cmap=plt.cm.Blues)
+#plt.xlabel('Predicted')
+#plt.ylabel('Actual')
+#plt.show()
 
 
 # Displaying test data with its actual and predicted label
