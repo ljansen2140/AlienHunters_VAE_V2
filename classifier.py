@@ -9,6 +9,9 @@ from keras.layers import Conv2D, MaxPool2D, Flatten, Dense, Dropout
 from keras.models import Sequential, load_model
 from keras.callbacks import EarlyStopping
 
+#VAE Model File: ./vae_experimental.py
+import vae_experimental as vexp
+
 
 # Loading data
 (X_train, y_train), (X_test, y_test) = cifar10.load_data()
@@ -26,7 +29,7 @@ for i in range(3):
         axes[i,j].get_xaxis().set_visible(False)
         axes[i,j].get_yaxis().set_visible(False)
         index += 1
-plt.show()
+#plt.show()
 
 
 # Convert both X_train and X_test to grayscale
@@ -44,7 +47,7 @@ for i in range(3):
         axes[i,j].get_xaxis().set_visible(False)
         axes[i,j].get_yaxis().set_visible(False)
         index += 1
-plt.show()
+#plt.show()
 
 
 # Value normalization
@@ -105,6 +108,7 @@ history = model.fit(X_train, y_train, epochs=5, batch_size=32, validation_data=(
 
 # Saving/loading model
 model.save('CNN_CIFAR.h5')
+
 model = load_model('CNN_CIFAR.h5')
 
 
@@ -120,11 +124,12 @@ model = load_model('CNN_CIFAR.h5')
 #plt.show()
 
 
-# Predicting test data
-predictions = model.predict(X_test)
-predictions = one_hot_encoder.inverse_transform(predictions)
 
-y_test = one_hot_encoder.inverse_transform(y_test)
+# Predicting test data
+#predictions = model.predict(X_test)
+#predictions = one_hot_encoder.inverse_transform(predictions)
+
+#y_test = one_hot_encoder.inverse_transform(y_test)
 
 
 # Creating confusion matrix
@@ -138,20 +143,20 @@ y_test = one_hot_encoder.inverse_transform(y_test)
 
 
 # Displaying test data with its actual and predicted label
-X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2])
+#X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2])
 
-y_test = y_test.astype(int)
-predictions = predictions.astype(int)
+#y_test = y_test.astype(int)
+#predictions = predictions.astype(int)
 
-fig, axes = plt.subplots(ncols=7, nrows=3, sharex=False,
-    sharey=True, figsize=(17, 8))
-index = 0
-for i in range(3):
-    for j in range(7):
-        axes[i,j].set_title('actual:' + labels[y_test[index][0]] + '\n' 
-                            + 'predicted:' + labels[predictions[index][0]])
-        axes[i,j].imshow(X_test[index], cmap='gray')
-        axes[i,j].get_xaxis().set_visible(False)
-        axes[i,j].get_yaxis().set_visible(False)
-        index += 1
-plt.show()
+#fig, axes = plt.subplots(ncols=7, nrows=3, sharex=False,
+#    sharey=True, figsize=(17, 8))
+#index = 0
+#for i in range(3):
+#    for j in range(7):
+#        axes[i,j].set_title('actual:' + labels[y_test[index][0]] + '\n' 
+#                            + 'predicted:' + labels[predictions[index][0]])
+#        axes[i,j].imshow(X_test[index], cmap='gray')
+#        axes[i,j].get_xaxis().set_visible(False)
+#        axes[i,j].get_yaxis().set_visible(False)
+#        index += 1
+#plt.show()
