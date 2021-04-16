@@ -89,7 +89,7 @@ for i in range(total_plot):
 	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
 	new_im = encoder.predict(base_im)
 	#Perturb
-	new_im[0][0] = 0
+	new_im[0][0] = 100
 
 	results = decoder.predict(new_im)
 	
