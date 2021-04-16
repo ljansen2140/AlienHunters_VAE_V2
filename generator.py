@@ -85,13 +85,15 @@ mf_file.close()
 
 
 for i in range(total_plot):
-	#new_im = genRandData(512)
+	noise = genRandData(512)
+	
 	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
-	new_im = encoder.predict(base_im)
+	enc_im = encoder.predict(base_im)
+	
 	#Perturb
-	#new_im[0][100] = 0
+	p_im = np.add(enc_im, noise)
 
-	results = decoder.predict(new_im)
+	results = decoder.predict(p_im)
 	
 	grid[i].set_aspect('equal')
 	grid[i].imshow(results[0], cmap = plt.cm.binary)
