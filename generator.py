@@ -91,10 +91,9 @@ for i in range(total_plot):
 	enc_im = encoder.predict(base_im)
 	
 	#Perturb
-	p_im = np.add(enc_im, noise)
-	p_im = p_im /2.
+	enc_im = enc_im[0][::-1]
 
-	results = decoder.predict(p_im)
+	results = decoder.predict(enc_im)
 	
 	grid[i].set_aspect('equal')
 	grid[i].imshow(results[0], cmap = plt.cm.binary)
