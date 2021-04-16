@@ -23,6 +23,7 @@ from pipeline import load_im, load_manifest, load_manifest_count, load_manifest_
 #MNIST
 from keras.datasets import mnist
 import numpy as np
+import random
 
 
 # Random Data Generator
@@ -91,8 +92,7 @@ for i in range(total_plot):
 	enc_im = encoder.predict(base_im)
 	
 	#Perturb
-	enc_im = enc_im[0][::-1]
-	enc_im = np.reshape(enc_im, (1,512))
+	enc_im[0][random.randint(0,511)] = 0
 
 	results = decoder.predict(enc_im)
 	
