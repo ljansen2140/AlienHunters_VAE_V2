@@ -92,6 +92,7 @@ for i in range(total_plot):
 	
 	#Perturb
 	enc_im = enc_im[0][::-1]
+	enc_im = np.reshape(enc_im, (1,512))
 
 	results = decoder.predict(enc_im)
 	
