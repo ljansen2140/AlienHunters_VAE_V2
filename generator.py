@@ -57,12 +57,29 @@ encoder = tf.keras.models.load_model('model/VAE_encoder')
 
 ##########################################
 
+rows = 5
+ims_per_row = 5
+
+
+#Image Plotting Here
+total_plot = rows*ims_per_row
+
+fig = plt.figure(figsize=(ims_per_row, rows))
+fig.set_size_inches(40,40)
+grid = ImageGrid(fig, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
+
+
+##########################################
+
 # Generate new images here
 
-new_im = genRandData(512)
-results = decoder.predict(new_im)
 
+for i in range(total_plot):
+	new_im = genRandData(512)
+	results = decoder.predict(new_im)
+	
+	grid[i].set_aspect('equal')
+	grid.imshow(results[0], cmap = plt.cm.binary)
 
-plt.imshow(results[0], cmap = plt.cm.binary)
 #plt.show()
-plt.savefig("GenImage.png")
+fig.savefig("GenImages.png")
