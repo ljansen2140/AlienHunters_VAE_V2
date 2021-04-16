@@ -6,6 +6,7 @@ from keras import backend as K
 import sys
 import pickle
 import os
+import gc
 
 import matplotlib.pyplot as plt
 
@@ -37,7 +38,7 @@ CIFAR10_Filenames = ['data_batch_1','data_batch_2','data_batch_3','data_batch_4'
 # load_data_sets(file_list, data_id)
 # Default data ID is 3 for Cats - See data_builder.py for details
 
-pic_data = datab.load_data_sets(CIFAR10_Filenames)
+# pic_data = datab.load_data_sets(CIFAR10_Filenames)
 
 # ^^^ Used for CIFAR10
 
@@ -59,10 +60,10 @@ if (len(sys.argv) > 1):
 
 #CONSTANTS
 
-LATENT_DIM = 32
+LATENT_DIM = 512
 HIDDEN_LAYER_DIM = 2048
 
-IMAGE_DIMENSIONS = (32,32)
+IMAGE_DIMENSIONS = (512,512)
 
 input_shape = IMAGE_DIMENSIONS + (3,)
 
@@ -85,19 +86,29 @@ x = layers.Conv2D(32, kernel_size=(4,4), padding='same', activation='relu', stri
 x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_1')(x)
 
 #Convolutional Layer 2
-x = layers.Conv2D(64, kernel_size=2, padding='same', activation='relu', strides=2, name='Conv_Layer_2')(x)
+x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=1, name='Conv_Layer_2')(x)
 x = layers.MaxPooling2D((2,2), padding='same', name='Pooling_Layer_2')(x)
 
 #Convolutional Layer 3
-x = layers.Conv2D(128, kernel_size=1, padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
+x = layers.Conv2D(64, kernel_size=1, padding='same', activation='relu', strides=1, name='Conv_Layer_3')(x)
+#x = layers.MaxPooling2D((4,4), padding='same', name='Pooling_Layer_3')(x)
+
+#Convolutional Layer 4
+#x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_4')(x)
+
+#Convolutional Layer 5
+#x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_5')(x)
+
+#x = layers.Conv2D(64, kernel_size=(4,4), padding='same', activation='relu', strides=(4,4), name='Conv_Layer_6')(x)
+
 
 #Flatten Data and Hidden Layer
 flat_layer = layers.Flatten(name='Flatten_Layer')(x)
-#hidden_layer = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(flat_layer)
+hidden_layer = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(flat_layer)
 
 #Latent Space is Built Here
-z_mean = layers.Dense(LATENT_DIM, name='Z_MEAN')(flat_layer)
-z_log_var = layers.Dense(LATENT_DIM, name='Z_LOG_VAR')(flat_layer)
+z_mean = layers.Dense(LATENT_DIM, name='Z_MEAN')(hidden_layer)
+z_log_var = layers.Dense(LATENT_DIM, name='Z_LOG_VAR')(hidden_layer)
 
 encoder_output = layers.Lambda(sampling, output_shape=(LATENT_DIM,), name='Latent_Space')([z_mean, z_log_var])
 
@@ -110,20 +121,27 @@ encoder.summary()
 #Make the decoder Here
 decoder_input = keras.Input(shape=(LATENT_DIM,))
 #Reverse Hidden Layers
-#x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
-x = layers.Dense(128 * 1 * 1, name='Upscale_Layer')(decoder_input)
+x = layers.Dense(HIDDEN_LAYER_DIM, name='Hidden_Layer')(decoder_input)
+x = layers.Dense(64 * 32 * 32, name='Upscale_Layer')(x)
 
 #Reshape for Conv Layers
-x = layers.Reshape((1, 1, 128))(x)
+x = layers.Reshape((32, 32, 64))(x)
+
+#x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_6')(x)
+
+#x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_5')(x)
+
+#x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_4')(x)
 
 #Convolutional Layers Transpose and UpSampling
-x = layers.Conv2DTranspose(64, kernel_size=1, padding='same', strides=1, activation='relu', name='Transpose_Layer_3')(x)
+#x = layers.UpSampling2D((4,4), name="UpSample_Layer_3")(x)
+x = layers.Conv2DTranspose(64, kernel_size=1, padding='same', strides=1, activation='relu', name='TP_Layer_3')(x)
 
 x = layers.UpSampling2D((2,2), name="UpSample_Layer_2")(x)
-x = layers.Conv2DTranspose(64, kernel_size=2, padding='same', strides=2, activation='relu', name='Transpose_Layer_2')(x)
+x = layers.Conv2DTranspose(64, kernel_size=(4,4), padding='same', strides=1, activation='relu', name='TP_Layer_2')(x)
 
 x = layers.UpSampling2D((2,2), name="UpSample_Layer_1")(x)
-x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='valid', strides=(4,4), activation='relu', name='Transpose_Layer_1')(x)
+x = layers.Conv2DTranspose(32, kernel_size=(4,4), padding='same', strides=(4,4), activation='relu', name='TP_Layer_1')(x)
 
 
 decoder_output = layers.Conv2D(3, kernel_size=(4,4), padding='same', activation='sigmoid', name='Transpose_RGB_Layer')(x)
@@ -161,8 +179,8 @@ vae.compile(optimizer='adam')
 
 #Setup training and validation data
 #CIFAR10 DATA
-training_data = pic_data[:4000]
-validation_data = pic_data[4000:]
+# training_data = pic_data[:4000]
+# validation_data = pic_data[4000:]
 
 
 # train_count = 32
@@ -170,16 +188,16 @@ validation_data = pic_data[4000:]
 
 
 #Load Manifest
-# mf_file = open("train.manifest", "r")
-# data = mf_file.read()
-# training_manifest = data.split(" ")
-# mf_file.close()
+mf_file = open("train.manifest", "r")
+data = mf_file.read()
+training_manifest = data.split(" ")
+mf_file.close()
 
 #Load Validation Manifest
-# mf_file = open("val.manifest", "r")
-# data = mf_file.read()
-# validation_manifest = data.split(" ")
-# mf_file.close()
+mf_file = open("val.manifest", "r")
+data = mf_file.read()
+validation_manifest = data.split(" ")
+mf_file.close()
 
 
 ### Load Data From Static Location
@@ -220,19 +238,20 @@ validation_data = pic_data[4000:]
 #CONFIG-VARIABLES
 #Select static Sample data ranging [x:y-1]
 number_of_pics = 10
-sample_data = training_data[0:number_of_pics]
-sample_data_v = validation_data[0:number_of_pics]
+# sample_data = training_data[0:number_of_pics]
+# sample_data_v = validation_data[0:number_of_pics]
 
 # sample_data = load_im(train_manifest, number_of_pics, IMAGE_DIMENSIONS)
 # sample_data_v = load_im(val_manifest, number_of_pics, IMAGE_DIMENSIONS)
 
-# sample_data = load_manifest_count(training_manifest, IMAGE_DIMENSIONS, 10)
-# sample_data_v = load_manifest_count(validation_manifest, IMAGE_DIMENSIONS, 10)
+sample_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 10)
+sample_data_v = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 10)
 
 
 # Number of epochs to run for
-max_epochs = 20
-num_rows_plot = 10
+max_epochs = 10000
+num_rows_plot = 20
+
 
 #################################################################
 
@@ -305,8 +324,8 @@ for i in range(number_of_pics):
 
 #Setup Checkpoint Callbacks
 checkpoint_path = "model/model.ckpt"
-checkpoint_dir = os.path.dirname(checkpoint_path)
-cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1)
+#checkpoint_dir = os.path.dirname(checkpoint_path)
+#cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1)
 
 
 #If plot has been checkpointed, load it here
@@ -342,11 +361,11 @@ for epoch in range(start_at_epoch, max_epochs):
     #Load data for each epoch, 32 training images, 8 validation images
     #training_data = load_im(train_manifest, 32, IMAGE_DIMENSIONS)
     #validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
-    # training_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 32)
-    # validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 8)
+    training_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 32)
+    validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 8)
     #print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
     print("Running Epoch: " + str(epoch))
-    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data), callbacks=[cp_callback])
+    history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
 
     if epoch in epoch_plot_step:
         #plot_step(vae, sample_data, grid, number_of_pics, plot_iter)
@@ -365,7 +384,14 @@ for epoch in range(start_at_epoch, max_epochs):
         print("-----Saving Plot Data-----")
         np.save("training_plot_data_checkpoint.npy", plot_data)
         np.save("validation_plot_data_checkpoint.npy", plot_data_v)
-        
+
+        print("-----Saving Model Weights-----")
+        vae.save_weights(checkpoint_path)
+        print("Saved Mode Step: " + str(epoch))
+    #Garbage Collection
+    print("Clearing Memory...")
+    tf.keras.backend.clear_session()
+    gc.collect()
 
 
 ################################################################
@@ -382,6 +408,14 @@ for im_row_v in plot_data_v:
 
 
 ################################################################
+#SAVE MODELS HERE
+
+encoder.save('model/VAE_encoder') 
+decoder.save('model/VAE_decoder') 
+vae.save('model/VAE_full')
+
+
+################################################################
 #SAVE IMAGE RESULTS
 
 fig.savefig("training-results.png")
@@ -395,12 +429,8 @@ fig_v.show()
 #STATISTICS
 
 #FIXME: Stats not working???
-
-encoder.save('model/VAE_encoder.h5') 
-decoder.save('model/VAE_decoder.h5') 
-vae.save('model/VAE.h5')
-
 exit()
+
 
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
