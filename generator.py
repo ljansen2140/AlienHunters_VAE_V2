@@ -92,7 +92,7 @@ for i in range(total_plot):
 	enc_im = encoder.predict(base_im)
 	
 	#Perturb
-	enc_im[0][random.randint(0,511)] = 0
+	enc_im[0][random.randint(0,511)] = random.randint(-100,100)
 
 	results = decoder.predict(enc_im)
 	
