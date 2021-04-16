@@ -71,15 +71,24 @@ grid = ImageGrid(fig, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
 
 ##########################################
 
+#Load Manifest
+mf_file = open("train.manifest", "r")
+data = mf_file.read()
+training_manifest = data.split(" ")
+mf_file.close()
+
 # Generate new images here
 
 
 for i in range(total_plot):
-	new_im = genRandData(512)
+	#new_im = genRandData(512)
+	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
+	new_im = encoder.predict(base_im)
 	results = decoder.predict(new_im)
 	
 	grid[i].set_aspect('equal')
 	grid[i].imshow(results[0], cmap = plt.cm.binary)
+	print("Image " + str(i) + " Complete!")
 
 #plt.show()
 fig.savefig("GenImages.png")
