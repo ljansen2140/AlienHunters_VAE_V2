@@ -68,6 +68,10 @@ fig = plt.figure(figsize=(ims_per_row, rows))
 fig.set_size_inches(40,40)
 grid = ImageGrid(fig, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
 
+fig_o = plt.figure(figsize=(ims_per_row, rows))
+fig_o.set_size_inches(40,40)
+grid_o = ImageGrid(fig_o, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
+
 
 ##########################################
 
@@ -91,7 +95,10 @@ for i in range(total_plot):
 	
 	grid[i].set_aspect('equal')
 	grid[i].imshow(results[0], cmap = plt.cm.binary)
+	grid_o[i].set_aspect('equal')
+	grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
 	print("Image " + str(i) + " Complete!")
 
 #plt.show()
 fig.savefig("GenImages.png")
+fig_o.savefig("GenImages_original.png")
