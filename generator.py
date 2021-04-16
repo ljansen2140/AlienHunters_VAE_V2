@@ -79,7 +79,7 @@ for i in range(total_plot):
 	results = decoder.predict(new_im)
 	
 	grid[i].set_aspect('equal')
-	grid.imshow(results[0], cmap = plt.cm.binary)
+	grid[i].imshow(results[0], cmap = plt.cm.binary)
 
 #plt.show()
 fig.savefig("GenImages.png")
