@@ -86,12 +86,13 @@ mf_file.close()
 
 for i in range(total_plot):
 	noise = genRandData(512)
-	
+
 	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
 	enc_im = encoder.predict(base_im)
 	
 	#Perturb
 	p_im = np.add(enc_im, noise)
+	p_im = p_im /2.
 
 	results = decoder.predict(p_im)
 	
