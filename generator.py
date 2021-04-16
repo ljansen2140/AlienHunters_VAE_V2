@@ -92,7 +92,9 @@ for i in range(total_plot):
 	enc_im = encoder.predict(base_im)
 	
 	#Perturb
-	enc_im[0][random.randint(0,511)] = random.randint(-100,100)
+	r_dim=random.randint(0,511)
+	r_val=random.randint(-100,100)
+	enc_im[0][r_dim] = r_val
 
 	results = decoder.predict(enc_im)
 	
@@ -101,6 +103,8 @@ for i in range(total_plot):
 	grid_o[i].set_aspect('equal')
 	grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
 	print("Image " + str(i) + " Complete!")
+	print("Dim: " + str(r_dim) + " | Val: " + str(r_val))
+
 
 #plt.show()
 fig.savefig("GenImages.png")
