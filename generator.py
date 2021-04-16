@@ -50,9 +50,9 @@ input_shape = IMAGE_DIMENSIONS + (3,)
 
 # Load the model parts
 
-decoder = tf.keras.models.load_model('model/VAE_decoder.h5')
-encoder = tf.keras.models.load_model('model/VAE_encoder.h5')
-VAE = tf.keras.models.load_model('model/VAE.h5')
+decoder = tf.keras.models.load_model('model/VAE_decoder')
+encoder = tf.keras.models.load_model('model/VAE_encoder')
+VAE = tf.keras.models.load_model('model/VAE')
 
 
 ##########################################
