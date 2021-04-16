@@ -84,6 +84,9 @@ for i in range(total_plot):
 	#new_im = genRandData(512)
 	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
 	new_im = encoder.predict(base_im)
+	#Perturb
+	new_im[0][0] = 0
+
 	results = decoder.predict(new_im)
 	
 	grid[i].set_aspect('equal')
