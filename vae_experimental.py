@@ -362,7 +362,7 @@ for epoch in range(start_at_epoch, max_epochs):
     #training_data = load_im(train_manifest, 32, IMAGE_DIMENSIONS)
     #validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
     training_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 32)
-    validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 8)
+    validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 32)
     #print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
     print("Running Epoch: " + str(epoch))
     history = vae.fit(training_data, training_data, epochs=1, validation_data=(validation_data, validation_data))
