@@ -62,7 +62,9 @@ def classifier_function(images):
 
 
 # Predicting the test data
-	predictions = model.predict(########X_test)
+	predictions = model.predict(images)
+	
+	#Return prediction results 
 	predictions = one_hot_encoder.inverse_transform(predictions)
 
 	
