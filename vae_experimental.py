@@ -60,7 +60,7 @@ if (len(sys.argv) > 1):
 
 #CONSTANTS
 
-LATENT_DIM = 128
+LATENT_DIM = 512
 HIDDEN_LAYER_DIM = 2048
 
 IMAGE_DIMENSIONS = (512,512)
@@ -249,7 +249,7 @@ sample_data_v = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 10)
 
 
 # Number of epochs to run for
-max_epochs = 10000
+max_epochs = 1000
 num_rows_plot = 20
 
 
