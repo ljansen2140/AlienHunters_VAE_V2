@@ -249,7 +249,7 @@ sample_data_v = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 10)
 
 
 # Number of epochs to run for
-max_epochs = 1000
+max_epochs = 500
 num_rows_plot = 20
 
 
@@ -361,7 +361,7 @@ for epoch in range(start_at_epoch, max_epochs):
     #Load data for each epoch, 32 training images, 8 validation images
     #training_data = load_im(train_manifest, 32, IMAGE_DIMENSIONS)
     #validation_data = load_im(val_manifest, 8, IMAGE_DIMENSIONS)
-    training_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 32)
+    training_data = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 64)
     validation_data = load_manifest_rand(validation_manifest, IMAGE_DIMENSIONS, 32)
     #print("Loaded batch for epoch " + str(epoch) + " in " + str(time.time()-start_load) + " seconds.")
     print("Running Epoch: " + str(epoch))
