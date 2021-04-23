@@ -102,7 +102,7 @@ for i in range(0, int(total_plot/2), 2):
 	
 	grid[i].set_aspect('equal')
 	grid[i].imshow(results[0], cmap = plt.cm.binary)
-	grid[i].set_ylable("Dim = " + str(dim))
+	grid[i].set_ylabel("Dim = " + str(dim))
 	grid[i+1].set_aspect('equal')
 	grid[i+1].imshow(base_im[0], cmap = plt.cm.binary)
 	# grid_o[i].set_aspect('equal')
