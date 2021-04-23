@@ -69,9 +69,9 @@ fig = plt.figure(figsize=(ims_per_row, rows))
 fig.set_size_inches(40,40)
 grid = ImageGrid(fig, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
 
-# fig_o = plt.figure(figsize=(ims_per_row, rows))
-# fig_o.set_size_inches(40,40)
-# grid_o = ImageGrid(fig_o, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
+fig_o = plt.figure(figsize=(ims_per_row, rows))
+fig_o.set_size_inches(40,40)
+grid_o = ImageGrid(fig_o, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
 
 
 ##########################################
@@ -88,24 +88,24 @@ mf_file.close()
 for i in range(total_plot):
 	noise = genRandData(512)
 
-	# base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
-	# enc_im = encoder.predict(base_im)
+	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
+	enc_im = encoder.predict(base_im)
 	
 	#Perturb
-	# r_dim=random.randint(0,511)
-	# r_val=random.randint(-100,100)
-	# enc_im[0][r_dim] = r_val
+	r_dim=random.randint(0,511)
+	r_val=random.randint(-100,100)
+	enc_im[0][r_dim] = r_val
 
-	results = decoder.predict(noise)
+	results = decoder.predict(enc_im)
 	
 	grid[i].set_aspect('equal')
 	grid[i].imshow(results[0], cmap = plt.cm.binary)
-	# grid_o[i].set_aspect('equal')
-	# grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
-	# print("Image " + str(i) + " Complete!")
-	# print("Dim: " + str(r_dim) + " | Val: " + str(r_val))
+	grid_o[i].set_aspect('equal')
+	grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
+	print("Image " + str(i) + " Complete!")
+	print("Dim: " + str(r_dim) + " | Val: " + str(r_val))
 
 
 #plt.show()
 fig.savefig("GenImages.png")
-# fig_o.savefig("GenImages_original.png")
+fig_o.savefig("GenImages_original.png")
