@@ -25,6 +25,8 @@ from keras.datasets import mnist
 import numpy as np
 import random
 
+from PIL import Image
+
 
 # Random Data Generator
 # Returns a random normal distribution of a specified size
@@ -32,6 +34,15 @@ def genRandData(size):
 	g1 = tf.random.get_global_generator()
 	o = g1.normal(shape=[1,size])
 	return o
+
+
+def loadLocal():
+	l = []
+	pim = Image.open("inf.png")
+	pim_np = np.asarray(pim)
+	pim_np = pim_np/255.
+	l.append(pim_np)
+	return np.asarray(l)
 
 
 
@@ -58,8 +69,8 @@ encoder = tf.keras.models.load_model('model/VAE_encoder')
 
 ##########################################
 
-rows = 20
-ims_per_row = 20
+rows = 1
+ims_per_row = 1
 
 
 #Image Plotting Here
@@ -84,28 +95,22 @@ mf_file.close()
 
 # Generate new images here
 
-base_im = load_manifest_count(training_manifest, IMAGE_DIMENSIONS, 1)
-
-dim = 0
-for i in range(0, total_plot, 2):
+for i in range(0, total_plot):
 	# noise = genRandData(512)
 
 	# base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
+	# enc_im = encoder.predict(base_im)
+	base_im = loadLocal()
 	enc_im = encoder.predict(base_im)
-	
 	#Perturb
 	# r_dim=random.randint(0,511)
 	# r_val=random.randint(-100,100)
-	enc_im[0][dim] = 10
+	# enc_im[0][dim] = 10
 
 	results = decoder.predict(enc_im)
 	
 	grid[i].set_aspect('equal')
 	grid[i].imshow(base_im[0], cmap = plt.cm.binary)
-	grid[i].set_ylabel("Dim = " + str(dim))
-	grid[i+1].set_aspect('equal')
-	grid[i+1].imshow(results[0], cmap = plt.cm.binary)
-	dim += 1
 	# grid_o[i].set_aspect('equal')
 	# grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
 	# print("Image " + str(i) + " Complete!")
