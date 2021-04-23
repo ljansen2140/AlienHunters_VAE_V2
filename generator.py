@@ -70,7 +70,7 @@ encoder = tf.keras.models.load_model('model/VAE_encoder')
 ##########################################
 
 rows = 1
-ims_per_row = 1
+ims_per_row = 3
 
 
 #Image Plotting Here
@@ -95,10 +95,10 @@ mf_file.close()
 
 # Generate new images here
 
-for i in range(0, total_plot):
+for i in range(0, total_plot, 3):
 	# noise = genRandData(512)
 
-	# base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
+	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 2)
 	# enc_im = encoder.predict(base_im)
 	base_im = loadLocal()
 	enc_im = encoder.predict(base_im)
@@ -106,11 +106,17 @@ for i in range(0, total_plot):
 	# r_dim=random.randint(0,511)
 	# r_val=random.randint(-100,100)
 	# enc_im[0][dim] = 10
+	l = np.asarray([np.concatenate((enc_im[0][:255],enc_im[0][255:]))])
 
-	results = decoder.predict(enc_im)
+
+	results = decoder.predict(l)
 	
-	grid[i].set_aspect('equal')
-	grid[i].imshow(results[0], cmap = plt.cm.binary)
+	grid[0].set_aspect('equal')
+	grid[0].imshow(results[0], cmap = plt.cm.binary)
+	grid[0].set_aspect('equal')
+	grid[0].imshow(base_im[0], cmap = plt.cm.binary)
+	grid[0].set_aspect('equal')
+	grid[0].imshow(base_im[1], cmap = plt.cm.binary)
 	# grid_o[i].set_aspect('equal')
 	# grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
 	# print("Image " + str(i) + " Complete!")
