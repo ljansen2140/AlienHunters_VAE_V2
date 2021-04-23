@@ -67,11 +67,11 @@ total_plot = rows*ims_per_row
 
 fig = plt.figure(figsize=(ims_per_row, rows))
 fig.set_size_inches(40,40)
-grid = ImageGrid(fig, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
+grid = ImageGrid(fig, 111, nrows_ncols=(rows, ims_per_row), axes_pad=0.1)
 
 # fig_o = plt.figure(figsize=(ims_per_row, rows))
 # fig_o.set_size_inches(40,40)
-# grid_o = ImageGrid(fig_o, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
+# grid_o = ImageGrid(fig_o, 111, nrows_ncols=(rows, ims_per_row), axes_pad=0.1)
 
 
 ##########################################
@@ -101,10 +101,11 @@ for i in range(0, int(total_plot/2), 2):
 	results = decoder.predict(enc_im)
 	
 	grid[i].set_aspect('equal')
-	grid[i].imshow(results[0], cmap = plt.cm.binary)
+	grid[i].imshow(base_im[0], cmap = plt.cm.binary)
 	grid[i].set_ylabel("Dim = " + str(dim))
 	grid[i+1].set_aspect('equal')
-	grid[i+1].imshow(base_im[0], cmap = plt.cm.binary)
+	grid[i+1].imshow(results[0], cmap = plt.cm.binary)
+	dim += 1
 	# grid_o[i].set_aspect('equal')
 	# grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
 	# print("Image " + str(i) + " Complete!")
