@@ -110,7 +110,7 @@ for i in range(0, total_plot):
 	results = decoder.predict(enc_im)
 	
 	grid[i].set_aspect('equal')
-	grid[i].imshow(base_im[0], cmap = plt.cm.binary)
+	grid[i].imshow(results[0], cmap = plt.cm.binary)
 	# grid_o[i].set_aspect('equal')
 	# grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
 	# print("Image " + str(i) + " Complete!")
