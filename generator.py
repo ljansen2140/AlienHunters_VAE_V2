@@ -105,7 +105,7 @@ for i in range(0, total_plot, 3):
 	# r_dim=random.randint(0,511)
 	# r_val=random.randint(-100,100)
 	# enc_im[0][dim] = 10
-	l = np.asarray([np.concatenate((enc_im[0][:255],enc_im[0][255:]))])
+	l = np.asarray([np.concatenate((enc_im[0][:127],enc_im[0][127:]))])
 
 
 	results = decoder.predict(l)
