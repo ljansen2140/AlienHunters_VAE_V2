@@ -87,7 +87,7 @@ mf_file.close()
 base_im = load_manifest_count(training_manifest, IMAGE_DIMENSIONS, 1)
 
 dim = 0
-for i in range(0, total_plot/2, 2):
+for i in range(0, int(total_plot/2), 2):
 	# noise = genRandData(512)
 
 	# base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
