@@ -100,7 +100,6 @@ for i in range(0, total_plot, 3):
 
 	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 2)
 	# enc_im = encoder.predict(base_im)
-	base_im = loadLocal()
 	enc_im = encoder.predict(base_im)
 	#Perturb
 	# r_dim=random.randint(0,511)
@@ -113,10 +112,10 @@ for i in range(0, total_plot, 3):
 	
 	grid[0].set_aspect('equal')
 	grid[0].imshow(results[0], cmap = plt.cm.binary)
-	grid[0].set_aspect('equal')
-	grid[0].imshow(base_im[0], cmap = plt.cm.binary)
-	grid[0].set_aspect('equal')
-	grid[0].imshow(base_im[1], cmap = plt.cm.binary)
+	grid[1].set_aspect('equal')
+	grid[1].imshow(base_im[0], cmap = plt.cm.binary)
+	grid[2].set_aspect('equal')
+	grid[2].imshow(base_im[1], cmap = plt.cm.binary)
 	# grid_o[i].set_aspect('equal')
 	# grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
 	# print("Image " + str(i) + " Complete!")
