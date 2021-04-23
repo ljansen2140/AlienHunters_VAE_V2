@@ -58,7 +58,7 @@ encoder = tf.keras.models.load_model('model/VAE_encoder')
 
 ##########################################
 
-rows = 4
+rows = 20
 ims_per_row = 20
 
 
