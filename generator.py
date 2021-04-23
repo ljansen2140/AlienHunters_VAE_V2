@@ -67,7 +67,7 @@ total_plot = rows*ims_per_row
 
 fig = plt.figure(figsize=(ims_per_row, rows))
 fig.set_size_inches(40,40)
-grid = ImageGrid(fig, 111, nrows_ncols=(rows, ims_per_row), axes_pad=0.1)
+grid = ImageGrid(fig, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
 
 # fig_o = plt.figure(figsize=(ims_per_row, rows))
 # fig_o.set_size_inches(40,40)
@@ -87,7 +87,7 @@ mf_file.close()
 base_im = load_manifest_count(training_manifest, IMAGE_DIMENSIONS, 1)
 
 dim = 0
-for i in range(0, int(total_plot/2), 2):
+for i in range(0, total_plot, 2):
 	# noise = genRandData(512)
 
 	# base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
