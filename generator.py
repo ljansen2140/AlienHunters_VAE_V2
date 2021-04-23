@@ -38,7 +38,7 @@ def genRandData(size):
 
 def loadLocal():
 	l = []
-	pim = Image.open("inf.png")
+	pim = Image.open("inf.jpg")
 	pim_np = np.asarray(pim)
 	pim_np = pim_np/255.
 	l.append(pim_np)
