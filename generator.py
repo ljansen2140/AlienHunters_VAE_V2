@@ -1,3 +1,5 @@
+
+# Dependancies
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
@@ -6,6 +8,7 @@ from keras import backend as K
 import sys
 import pickle
 import os
+import random
 
 import matplotlib.pyplot as plt
 
@@ -22,9 +25,8 @@ from pipeline import load_im, load_manifest, load_manifest_count, load_manifest_
 
 #MNIST
 from keras.datasets import mnist
-import numpy as np
-import random
 
+#Image Processing
 from PIL import Image
 
 
@@ -35,7 +37,8 @@ def genRandData(size):
 	o = g1.normal(shape=[1,size])
 	return o
 
-
+# Loads a locally specified file
+# Not in use/depreciated
 def loadLocal():
 	l = []
 	pim = Image.open("inf.jpg")
@@ -44,7 +47,11 @@ def loadLocal():
 	l.append(pim_np)
 	return np.asarray(l)
 
-
+# Takes a base image and converts to the latent space. Then performs an add operation with a random normal distribution and reconstructs
+# encoder : encoder model
+# decoder : decoder model
+# base_im : A raw image in numpy (x,y,RGB) format
+# dim : The size of the latent space
 def perturbGen(encoder, decoder, base_im, dim):
 	enc_im = encoder.predict(base_im)
 	p_data = genRandData(dim)
@@ -52,6 +59,13 @@ def perturbGen(encoder, decoder, base_im, dim):
 	pred_im = decoder.predict(c_im)
 	return pred_im
 
+
+# Takes an input image and perturbs a single dimension within a random threshold
+# encoder : encoder model
+# decoder : decoder model
+# base_im : A raw image in numpy (x,y,RGB) format
+# target_dimension : Specified dimension to perturb
+# threshold : A 2 length tuple containing the min and max of a random integer, (min, max)
 def perturbGenSingleThreshold(encoder, decoder, base_im, target_dimension, threshold):
 	enc_im = encoder.predict(base_im)
 	enc_im[0][target_dimension] = random.randint(threshold[0], threshold[1])
@@ -59,6 +73,9 @@ def perturbGenSingleThreshold(encoder, decoder, base_im, target_dimension, thres
 	return pred_im
 
 
+# Randomly generates a random normal distribution in a give size and generates an image from it
+# decoder : decoder model
+# dim : Size of the latent space
 def randomGen(decoder, dim):
 	r_data = genRandData(dim) 
 	pred_im = decoder.predict(r_data)
@@ -89,13 +106,20 @@ encoder = tf.keras.models.load_model('model/VAE_encoder')
 
 ##########################################
 
+## CONFIGURATION VALUES ##
+# Change these to edit the number of images created
+
+# Number of rows
 rows = 5
+# Number of images per row
 ims_per_row = 5
+
 
 
 #Image Plotting Here
 total_plot = rows*ims_per_row
 
+# Setup a grid
 fig = plt.figure(figsize=(ims_per_row, rows))
 fig.set_size_inches(40,40)
 grid = ImageGrid(fig, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
@@ -114,13 +138,17 @@ mf_file.close()
 for i in range(0, total_plot, 3):
 
 	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
+
+	#Generation happens here. Three predifined functions are availible. Any configuration can be created, however.
 	gen_im = perturbGen(encoder, decoder, base_im, 512)
 	# gen_im = perturbGenSingleThreshold(encoder, decoder, base_im, 0, (-10,10))
 	# gen_im = randomGen(decoder, 512)
 	
-	
+	#Plot images here
 	grid[0].set_aspect('equal')
 	grid[0].imshow(gen_im[0], cmap = plt.cm.binary)
 
+
+#Output image data here
 #plt.show()
 fig.savefig("GenImages.png")
