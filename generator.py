@@ -54,7 +54,7 @@ def perturbGen(encoder, decoder, base_im, dim):
 
 def perturbGenSingleThreshold(encoder, decoder, base_im, target_dimension, threshold):
 	enc_im = encoder.predict(base_im)
-	c_im = enc_im[0][target_dimension] = rand.randint(threshold[0], threshold[1])
+	c_im = enc_im[0][target_dimension] = random.randint(threshold[0], threshold[1])
 	pred_im = decoder.predict(c_im)
 	return pred_im
 
