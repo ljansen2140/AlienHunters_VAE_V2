@@ -120,7 +120,7 @@ for i in range(0, total_plot, 3):
 	
 	
 	grid[0].set_aspect('equal')
-	grid[0].imshow(results[0], cmap = plt.cm.binary)
+	grid[0].imshow(gen_im[0], cmap = plt.cm.binary)
 
 #plt.show()
 fig.savefig("GenImages.png")
