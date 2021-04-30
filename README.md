@@ -49,3 +49,5 @@ This project was built using the following python packages and versions; newer v
 
 ## Manifest Specifications
 In order to run `vae.py` you must generate your own manifest to load files from. A manifest should consist of a space `" "` seperated list of absolute filepaths. The manifest should also contain a space at the end. All manifest loading functions can be found in `pipeline.py`.
+
+For an example on how to properly generate a manifest, please see this repository for generating manifests and normalizing images from the IARPA Functional Map of the World dataset: https://github.com/ljansen2140/ManifestGen-Tools
