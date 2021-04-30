@@ -8,11 +8,13 @@ This project was made to create a proof of concept for synthetic satellite image
 ### vae.py
 This is the main file used for training the model; depends on `pipeline.py`.
 Inside the file, any variables under the `CONFIGURATION VARIABLES` or the `CONSTANTS CONFIGURATION` sections may be editted to alter functionality as necessary.
+
 Note that a generated manifest is required for model training. See manifest specification below.
 
 Usage:
 - `python vae.py [arg]`
-- Note: Only one argument can be passed at once
+
+Note: Only one argument can be passed at once
 
 Command Line Arguments:
 - `--load [int]		| Load checkpoint model and start at specified epoch`
@@ -29,15 +31,16 @@ To alter the output specifications you must manually edit the values under the `
 **Note:** This model was built to run on Ubuntu and may not function correctly on Windows based systems.
 
 ### Directory Setup
-- In order to properly run this program you must create a folder named 'model' in the base directory
+In order to properly run this program you must create a folder named 'model' in the base directory
 
 ### Necessary Files
 - Training Manifest
 - Validation Manifest
+
 See manifest specification below.
 
 ### Project Versions
-This project was built using the following python packages and versions; newer versions may work but are not guarunteed.
+This project was built using the following python packages and versions; newer versions may work but are not guaranteed.
 - Python 3.7.6
 - Numpy 1.19.5
 - Tensorflow 2.4.1
