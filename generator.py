@@ -1,3 +1,8 @@
+# generator.py
+# 
+# This file is used to generate unique imagery from a trained vae mode
+# 	It is required to run vae.py before this program can be used
+#
 
 # Dependancies
 import numpy as np

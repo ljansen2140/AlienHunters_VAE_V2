@@ -1,32 +1,10 @@
+# pipeline.py
+#
 # Pipeline helper for setting up data transfer
-
-
-
-######################################
-# Pipeline doc:
-# 
-# Load initial batch:
-# 	Dataset = (Train[16],Validation[8])
-# 	LoadRandData(): Return Dataset
-# 
-# -MainCycle-
 #
-# Aync Start Load Next Data Batch:
-# 	Loaded=FALSE
-# 	Async(LoadRandData()=>NextDataBatch):
-# 		OnComplete: Set Loaded=TRUE
-# 	Start Fit:
-#		VAE.fit(Train,Validation)
-# 
-# If Loaded = FALSE:
-# 	Await Loaded = TRUE
-# 
-# Dataset = NextDataBatch
-# Delete OldDataset
-# Loop MainCycle
-# 
+# Manifest Specifications:
+#	A manifest is a file that includes a series of space ' ' seperated absolute filepaths
 #
-######################################
 
 
 #Necessary Imports
@@ -37,13 +15,18 @@ import random
 
 
 #Hardcoded Directory Path
-#FIXME: Allow user defined path??
+#NOTE: This is utilzed in depreciated functions only
 directory = "/home/ubuntu/fmow-rgb-dataset/"
 
 
+
+#load_im(): Loads a number of images based on a manifest
+# NOTE: This function is depreciated. It is not recommended to use it
+# 	It implements on the fly image normalization which is not efficient
 #manifest - List of all possible filepaths
 #num_imgs - How many images to return
 #dim - The dimensions of the image to load, should be in size (X,Y)
+## DEPRECIATED ##
 def load_im(manifest, num_imgs, dim):
 
 	return_data = np.empty((0,) + dim + (3,))
@@ -73,11 +56,16 @@ def load_im(manifest, num_imgs, dim):
 	return return_data
 
 
+
 #Loads all images from a specified Manifest
 def load_manifest(manifest, dim):
 	#return_data = np.empty((0,) + dim + (3,))
 	#reshape_size = dim + (3,)
+
+	# Create an empty list for concatenate work around
 	image_list = []
+
+	# Load each image individually
 	for obj in manifest:
 		if obj == "":
 			continue
