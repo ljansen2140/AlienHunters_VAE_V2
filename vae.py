@@ -8,7 +8,7 @@
 #
 #	Command Line Arguments:
 #	--load [int]	| Load checkpoint model and start at specified epoch
-#	--l [int]		| Alias for --load
+#	-l [int]		| Alias for --load
 #	--arch			| Shown model architecture only, do not execute
 #	-a 				| Alias for --arch
 #
@@ -84,6 +84,11 @@ max_epochs = 10000
 num_rows_plot = 20
 
 #NOTE: Model checkpointing intervals are currently determined by (max_epochs/num_rows_plot)
+
+# Manifest filenames
+# These should be changed to the values of your generated manifests
+traing_mf_name = "train.manifest"
+validation_mf_name = "val.manifest"
 
 
 ################################################################
@@ -247,13 +252,13 @@ vae.compile(optimizer='adam')
 
 
 #Load Manifest
-mf_file = open("train.manifest", "r")
+mf_file = open(traing_mf_name, "r")
 data = mf_file.read()
 training_manifest = data.split(" ")
 mf_file.close()
 
 #Load Validation Manifest
-mf_file = open("val.manifest", "r")
+mf_file = open(validation_mf_name, "r")
 data = mf_file.read()
 validation_manifest = data.split(" ")
 mf_file.close()
