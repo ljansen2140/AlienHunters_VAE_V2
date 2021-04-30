@@ -45,6 +45,26 @@ def loadLocal():
 	return np.asarray(l)
 
 
+def perturbGen(encoder, decoder, base_im, dim):
+	enc_im = encoder.predict(base_im)
+	p_data = genRandData(dim)
+	c_im = enc_im + p_data
+	pred_im = decoder.predict(c_im)
+	return pred_im
+
+def perturbGenSingleThreshold(encoder, decoder, base_im, target_dimension, threshold):
+	enc_im = encoder.predict(base_im)
+	c_im = enc_im[0][target_dimension] = rand.randint(threshold[0], threshold[1])
+	pred_im = decoder.predict(c_im)
+	return pred_im
+
+
+def randomGen(decoder, dim):
+	r_data = genRandData(dim) 
+	pred_im = decoder.predict(r_data)
+	return pred_im
+
+
 
 # - Data Needed for Loading the VAE
 #CIFAR10 Filename List for importer
@@ -69,8 +89,8 @@ encoder = tf.keras.models.load_model('model/VAE_encoder')
 
 ##########################################
 
-rows = 1
-ims_per_row = 3
+rows = 5
+ims_per_row = 5
 
 
 #Image Plotting Here
@@ -79,10 +99,6 @@ total_plot = rows*ims_per_row
 fig = plt.figure(figsize=(ims_per_row, rows))
 fig.set_size_inches(40,40)
 grid = ImageGrid(fig, 111, nrows_ncols=(ims_per_row, rows), axes_pad=0.1)
-
-# fig_o = plt.figure(figsize=(ims_per_row, rows))
-# fig_o.set_size_inches(40,40)
-# grid_o = ImageGrid(fig_o, 111, nrows_ncols=(rows, ims_per_row), axes_pad=0.1)
 
 
 ##########################################
@@ -96,32 +112,15 @@ mf_file.close()
 # Generate new images here
 
 for i in range(0, total_plot, 3):
-	# noise = genRandData(512)
 
-	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 2)
-	# enc_im = encoder.predict(base_im)
-	enc_im = encoder.predict(base_im)
-	#Perturb
-	# r_dim=random.randint(0,511)
-	# r_val=random.randint(-100,100)
-	# enc_im[0][dim] = 10
-	l = np.asarray([np.concatenate((enc_im[0][:255],enc_im[1][255:]))])
-
-
-	results = decoder.predict(l)
+	base_im = load_manifest_rand(training_manifest, IMAGE_DIMENSIONS, 1)
+	gen_im = perturbGen(encoder, decoder, base_im, 512)
+	# gen_im = perturbGenSingleThreshold(encoder, decoder, base_im, 0, (-10,10))
+	# gen_im = randomGen(decoder, 512)
+	
 	
 	grid[0].set_aspect('equal')
 	grid[0].imshow(results[0], cmap = plt.cm.binary)
-	grid[1].set_aspect('equal')
-	grid[1].imshow(base_im[0], cmap = plt.cm.binary)
-	grid[2].set_aspect('equal')
-	grid[2].imshow(base_im[1], cmap = plt.cm.binary)
-	# grid_o[i].set_aspect('equal')
-	# grid_o[i].imshow(base_im[0], cmap = plt.cm.binary)
-	# print("Image " + str(i) + " Complete!")
-	# print("Dim: " + str(r_dim) + " | Val: " + str(r_val))
-
 
 #plt.show()
 fig.savefig("GenImages.png")
-# fig_o.savefig("GenImages_original.png")
