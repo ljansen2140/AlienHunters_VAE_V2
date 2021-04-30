@@ -39,7 +39,7 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 
 
 
-#Data Builder File: ./data_builder.py
+#Data Builder File: ./data_builder.py - No longer in use
 import data_builder as datab
 
 #Data Pipeline for FMOW dataset: ./pipeline.py

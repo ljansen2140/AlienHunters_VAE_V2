@@ -1,24 +1,20 @@
 ###################################################################
 #                                                                 #
-# ./vae_code.py                                                   #
+# ./data_builder.py                                               #
 #                                                                 #
-# Main runtime code for variation auto-encoder training.          #
+# Code for loading the CIFAR10 dataset 					          #
+# 	Also has a fancy header										  #
 #                                                                 #
 ###################################################################
 
+# NOTE: This file is kept as a refernce for loading CIFAR10 data
+#	The modern VAE no longer implements any of this code.
 
-#---------------------------------------------------------
-#CIFAR10 Branch
-#---------------------------------------------------------
-#This code is indev code for making this VAE work with the CIFAR10 dataset, it may not run properly
-#TODO: Remove this on merge
 
+
+# Imports
 import pickle
 import numpy as np
-
-
-#Batch ID Ordering
-#[b'airplane', b'automobile', b'bird', b'cat', b'deer', b'dog', b'frog', b'horse', b'ship', b'truck']
 
 
 #Function for returning dictionary data from Pickle
